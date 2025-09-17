@@ -1,43 +1,83 @@
-📊 Sistema de Registro y Reporte de Alimentación de Lagos
+# 🐄 Sistema de Inventario para Ganadería  
 
-Este proyecto es un **sistema de inventario y registro de alimentación** para la gestión de insumos en lagos de cultivo. Permite registrar  sesiones de alimentación, visualizar el historial, monitorear el stock en tiempo real y generar reportes exportables en Excel filtrados por lago y rango de fechas.
+Proyecto en grupo para la **Fundación Escuela Tecnológica de Neiva (FET)**.  
+El sistema busca optimizar la administración ganadera mediante un **aplicativo web moderno**, que centralice la información de animales, nacimientos, muertes, ventas e inventario de alimentos, facilitando la toma de decisiones en tiempo real.  
 
-🚀 Tecnologías Utilizadas
-- **Next.js 14** – Framework principal
-- **TypeScript** – Tipado estricto y seguro
-- **Supabase** – Base de datos y backend en tiempo real
-- **Tailwind CSS** – Estilos rápidos y responsivos
-- **shadcn/ui** – Componentes UI modernos y elegantes
-- **React Hot Toast** – Notificaciones amigables
-- **XLSX & FileSaver.js** – Exportación a Excel
+---
 
-📝 Características Principales
-- ✅ Registro de sesiones de alimentación por lago y tipo de alimento.
-- ✅ Validación de stock antes de registrar alimentación.
-- ✅ Actualización automática del inventario después de cada registro.
-- ✅ Visualización del historial de alimentación.
-- ✅ Dashboard con:
-  - Total de inventario disponible.
-  - Productos con bajo stock.
-  - Alimento más consumido.
-  - Cantidad de alimentaciones del día.
-- ✅ Reporte filtrable por lago y rango de fechas.
-- ✅ Exportación de reportes a Excel.
+## 🚀 Objetivo General
+Desarrollar un sistema de información que permita administrar de manera organizada los datos del inventario ganadero, facilitando el control de animales, alimento y ventas.  
 
+---
 
-📤 Exportación de Reportes
-Los reportes de consumo se pueden exportar en formato .xlsx con un clic desde la vista Reporte de Consumo. Los datos incluyen:
-- Fecha
-- Lago
-- Alimento suministrado
-- Cantidad total suministrada
+## 👥 Integrantes del Proyecto
+- Jeinnert Steven Salazar Medina  
+- Juan Perdomo Oliveros  
+- Andrés Julián Cardozo Moreno  
 
+---
 
-👨‍💻 Autor
-Desarrollado con 💙 por Jeinnert Salazar
+## 🛠️ Tecnologías Propuestas  
 
-Si este proyecto te ayudó, ¡no dudes en darle una estrella ⭐ y compartirlo!
+### Frontend
+- **Next.js** → Framework de React con SSR/SSG para aplicaciones rápidas y escalables.  
+- **React** → Construcción de interfaces modulares y reutilizables.  
+- **TypeScript** → Tipado estático para mayor robustez.  
+- **TailwindCSS** → Framework de utilidades para estilos responsivos y consistentes.  
+- **Shadcn/UI** → Componentes accesibles basados en Radix UI + TailwindCSS.  
+- **Chart.js + react-chartjs-2** → Visualización de reportes (gráficas de barras, líneas, pasteles, etc.).  
+- **React Hot Toast** → Notificaciones rápidas y elegantes en la interfaz.  
 
-📬 Contacto
-- GitHub: @JeinnertSalazarM (https://github.com/JeinnertSalazarM)
-- Email: stevensalazsr@gmail.com
+### Backend / API
+- **Next.js API Routes** → Endpoints backend dentro del mismo proyecto.  
+- **Supabase Client (JS/TS SDK)** → Conexión con base de datos en la nube.  
+- **Supabase Auth** → Autenticación y control de usuarios.  
+
+### Base de Datos
+- **Supabase (PostgreSQL)** → Base de datos relacional en la nube con consultas en tiempo real.  
+
+### Exportación de Datos
+- **XLSX (SheetJS)** → Generación de hojas de cálculo.  
+- **FileSaver.js** → Descarga de archivos Excel desde el navegador.  
+
+### Control de Versiones
+- **Git + GitHub** → Control de cambios, ramas y trabajo colaborativo.  
+
+### Despliegue
+- **Vercel** → Hosting optimizado para proyectos Next.js.  
+- **Supabase Hosting** → Gestión de base de datos y servicios backend.  
+
+---
+
+## 📅 Plan de Trabajo (Metodología Ágil - 8 Sprints)
+1. **Requerimientos y diseño de arquitectura**  
+2. **Configuración de repositorio y base de datos inicial**  
+3. **CRUD de animales**  
+4. **Gestión de nacimientos y muertes**  
+5. **Registro de ventas y movimientos**  
+6. **Inventario de insumos y alimentación**  
+7. **Reportes y gráficas**  
+8. **Despliegue final y capacitación de usuarios**  
+
+---
+
+## 📊 Funcionalidades Principales
+- Registro y control de animales (raza, sexo, edad, peso, estado productivo).  
+- Control de nacimientos, muertes, compras y ventas.  
+- Inventario de insumos y consumo de alimento.  
+- Reportes y estadísticas en tiempo real.  
+- Exportación de información a **Excel**.  
+- Gestión de usuarios y seguridad con **Supabase Auth**.  
+
+---
+
+## 🌐 Despliegue
+- **Frontend + Backend**: [Vercel](https://vercel.com/)  
+- **Base de datos + Auth**: [Supabase](https://supabase.com/)  
+
+---
+
+## 📄 Licencia
+Este proyecto es de carácter académico y no cuenta con fines comerciales.  
+
+---

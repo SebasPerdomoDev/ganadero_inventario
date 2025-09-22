@@ -1,5 +1,7 @@
 "use client"
 import { ChartColumn,NotebookPen, Fish, Package , } from "lucide-react"
+import { PiCowFill } from "react-icons/pi";
+import { FaClipboardList } from "react-icons/fa";
 import Link from "next/link"
 import {
   Sidebar,
@@ -22,6 +24,16 @@ const items = [
     title: "Panel de Control",
     url: "/panel_control",
     icon: Fish,
+  },
+  {
+    title: "Registro Ganado",
+    url: "/registro_ganado",
+    icon: PiCowFill,
+  },
+  {
+    title: "Ganado",
+    url: "/ganado",
+    icon: FaClipboardList,
   },
   {
     title: "Inventario",

@@ -1,0 +1,188 @@
+"use client";
+
+import { supabase } from "@/lib/supabase";
+
+export default function Ganado() {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const data = {
+      id_animal: formData.get("idAnimal"),
+      raza: formData.get("raza"),
+      peso: Number(formData.get("peso")),
+      sexo: formData.get("sexo"),
+      fecha_nacimiento: formData.get("fechaNacimiento"),
+      fecha_ultimo_chequeo: formData.get("fechaUltimoChequeo"),
+      estado_salud: formData.get("estadoSalud"),
+      ubicacion: formData.get("ubicacion"),
+      observacion: formData.get("observacion"),
+    };
+
+    const { error } = await supabase.from("ganado").insert([data]);
+
+    if (error) {
+      console.error("❌ Error al registrar:", error.message);
+      alert("Hubo un error al guardar el animal");
+    } else {
+      console.log("✅ Registro guardado:", data);
+      alert("Animal registrado con éxito");
+      form.reset();
+    }
+  };
+
+  return (
+    <section className="max-w-3xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-xl border border-gray-200">
+      {/* Header */}
+      <header className="mb-6 text-center">
+        <h1 className="text-3xl font-bold text-cyan-700">Registro de Ganado 🐄</h1>
+        <span className="text-gray-600 text-sm">
+          Completa la información del nuevo animal
+        </span>
+      </header>
+
+      {/* Formulario */}
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">
+          Información Animal
+        </h2>
+
+        {/* Grid de inputs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              ID del Animal
+            </label>
+            <input
+              type="number"
+              name="idAnimal"
+              placeholder="ID del Animal"
+              required
+              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Raza
+            </label>
+            <input
+              type="text"
+              name="raza"
+              placeholder="Raza"
+              required
+              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Peso (kg)
+            </label>
+            <input
+              type="number"
+              name="peso"
+              placeholder="Peso (kg)"
+              required
+              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Sexo</label>
+            <select
+              name="sexo"
+              required
+              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+            >
+              <option value="">Selecciona el sexo</option>
+              <option value="macho">Macho</option>
+              <option value="hembra">Hembra</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Fecha de Nacimiento
+            </label>
+            <input
+              type="date"
+              name="fechaNacimiento"
+              required
+              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 cursor-pointer"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Fecha de Último Chequeo
+            </label>
+            <input
+              type="date"
+              name="fechaUltimoChequeo"
+              required
+              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 cursor-pointer"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Estado de Salud
+            </label>
+            <select
+              name="estadoSalud"
+              required
+              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 cursor-pointer"
+            >
+              <option value="">Selecciona</option>
+              <option value="saludable">Saludable</option>
+              <option value="tratamiento">En Tratamiento</option>
+              <option value="observacion">En Observación</option>
+              <option value="enfermo">Enfermo</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Ubicación
+            </label>
+            <select
+              name="ubicacion"
+              required
+              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 cursor-pointer"
+            >
+              <option value="">Selecciona</option>
+              <option value="rancho1">Rancho 1</option>
+              <option value="rancho2">Rancho 2</option>
+              <option value="rancho3">Rancho 3</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Observaciones */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Observación
+          </label>
+          <textarea
+            name="observacion"
+            placeholder="Notas Adicionales"
+            className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+          />
+        </div>
+
+        
+        <div className="text-center">
+          <button
+            type="submit"
+            className="cursor-pointer px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition"
+          >
+            Registrar Animal
+          </button>
+        </div>
+      </form>
+    </section>
+  );
+}

@@ -34,10 +34,10 @@ export default function Ganado() {
   };
 
   return (
-    <section className="max-w-3xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-xl border border-gray-200">
+    <section className="bg-white shadow-lg mx-auto mt-10 p-6 border border-gray-200 rounded-xl max-w-3xl">
       {/* Header */}
       <header className="mb-6 text-center">
-        <h1 className="text-3xl font-bold text-cyan-700">Registro de Ganado 🐄</h1>
+        <h1 className="font-bold text-cyan-700 text-3xl">Registro de Ganado 🐄</h1>
         <span className="text-gray-600 text-sm">
           Completa la información del nuevo animal
         </span>
@@ -45,14 +45,14 @@ export default function Ganado() {
 
       {/* Formulario */}
       <form onSubmit={handleSubmit} className="space-y-5">
-        <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">
+        <h2 className="mb-4 pb-2 border-b font-semibold text-gray-800 text-xl">
           Información Animal
         </h2>
 
         {/* Grid de inputs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="gap-6 grid grid-cols-1 md:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block font-medium text-gray-700 text-sm">
               ID del Animal
             </label>
             <input
@@ -60,12 +60,12 @@ export default function Ganado() {
               name="idAnimal"
               placeholder="ID del Animal"
               required
-              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block font-medium text-gray-700 text-sm">
               Raza
             </label>
             <input
@@ -73,12 +73,12 @@ export default function Ganado() {
               name="raza"
               placeholder="Raza"
               required
-              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block font-medium text-gray-700 text-sm">
               Peso (kg)
             </label>
             <input
@@ -86,16 +86,16 @@ export default function Ganado() {
               name="peso"
               placeholder="Peso (kg)"
               required
-              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Sexo</label>
+            <label className="block font-medium text-gray-700 text-sm">Sexo</label>
             <select
               name="sexo"
               required
-              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full"
             >
               <option value="">Selecciona el sexo</option>
               <option value="macho">Macho</option>
@@ -104,37 +104,37 @@ export default function Ganado() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block font-medium text-gray-700 text-sm">
               Fecha de Nacimiento
             </label>
             <input
               type="date"
               name="fechaNacimiento"
               required
-              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 cursor-pointer"
+              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full cursor-pointer"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block font-medium text-gray-700 text-sm">
               Fecha de Último Chequeo
             </label>
             <input
               type="date"
               name="fechaUltimoChequeo"
               required
-              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 cursor-pointer"
+              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full cursor-pointer"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block font-medium text-gray-700 text-sm">
               Estado de Salud
             </label>
             <select
               name="estadoSalud"
               required
-              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 cursor-pointer"
+              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full cursor-pointer"
             >
               <option value="">Selecciona</option>
               <option value="saludable">Saludable</option>
@@ -145,13 +145,13 @@ export default function Ganado() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block font-medium text-gray-700 text-sm">
               Ubicación
             </label>
             <select
               name="ubicacion"
               required
-              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 cursor-pointer"
+              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full cursor-pointer"
             >
               <option value="">Selecciona</option>
               <option value="rancho1">Rancho 1</option>
@@ -163,21 +163,21 @@ export default function Ganado() {
 
         {/* Observaciones */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block font-medium text-gray-700 text-sm">
             Observación
           </label>
           <textarea
             name="observacion"
             placeholder="Notas Adicionales"
-            className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+            className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full"
           />
         </div>
 
-        
+
         <div className="text-center">
           <button
             type="submit"
-            className="cursor-pointer px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition"
+            className="bg-green-600 hover:bg-green-700 shadow px-6 py-2 rounded-lg font-semibold text-white transition cursor-pointer"
           >
             Registrar Animal
           </button>

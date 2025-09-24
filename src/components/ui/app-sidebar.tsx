@@ -2,6 +2,7 @@
 import { ChartColumn,NotebookPen, Fish, Package , } from "lucide-react"
 import { PiCowFill } from "react-icons/pi";
 import { FaClipboardList } from "react-icons/fa";
+import { MdSpaceDashboard } from "react-icons/md";
 import Link from "next/link"
 import {
   Sidebar,
@@ -23,7 +24,7 @@ const items = [
   {
     title: "Panel de Control",
     url: "/panel_control",
-    icon: Fish,
+    icon: MdSpaceDashboard,
   },
   {
     title: "Registro Ganado",
@@ -62,10 +63,10 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>
             <div className="flex items-center gap-3 mt-2">
-              <div className="bg-blue-100 text-blue-600 p-2 rounded-full">
-                <Fish className="size-6" />
+              <div className="bg-blue-100 p-2 rounded-full text-blue-600">
+                <PiCowFill className="size-6" />
               </div>
-              <span className="text-xl font-bold tracking-wide text-gray-700">Fondo Ganadero </span>
+              <span className="font-bold text-gray-700 text-xl tracking-wide">Fondo Ganadero </span>
             </div>
 
           </SidebarGroupLabel>
@@ -87,7 +88,7 @@ export function AppSidebar() {
                           pathname.startsWith(item.url) ? 'bg-gray-200 font-semibold' : ''
                         }`}>
                         <item.icon />
-                        <span className=" active:font-medium">{item.title}</span>
+                        <span className="active:font-medium">{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

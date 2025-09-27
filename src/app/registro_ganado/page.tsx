@@ -1,4 +1,3 @@
-
 "use client"
 
 import { Button } from "@/components/ui/button"
@@ -17,6 +16,7 @@ import { supabase } from "@/lib/supabase"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import * as React from "react"
+import toast, { Toaster } from "react-hot-toast"
 
 export default function Ganado() {
   const [fechaNacimiento, setFechaNacimiento] = React.useState<Date | undefined>()
@@ -42,9 +42,9 @@ export default function Ganado() {
     const { error } = await supabase.from("animales").insert([data])
     if (error) {
       console.error("❌ Error al registrar:", error.message)
-      alert("Hubo un error al guardar el animal")
+      toast.error("Hubo un error al guardar el animal")
     } else {
-      alert("Animal registrado con éxito")
+      toast.success("✅ Animal registrado con éxito")
       form.reset()
       setFechaNacimiento(undefined)
       setFechaUltimoChequeo(undefined)
@@ -52,156 +52,159 @@ export default function Ganado() {
   }
 
   return (
-    <Card className="shadow-lg mx-auto mt-5 w-full">
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-5 w-full">
-          <h2 className="mb-4 pb-2 border-b font-semibold text-gray-800 text-xl">Información Animal</h2>
+    <>
+      <Toaster position="top-right" />
+      <Card className="shadow-lg mx-auto mt-5 w-full">
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-5 w-full">
+            <h2 className="mb-4 pb-2 border-b font-semibold text-gray-800 text-xl">Información Animal</h2>
 
-          <div className="gap-4 grid md:grid-cols-2 w-full">
-            {/* ID del Animal */}
+            <div className="gap-4 grid md:grid-cols-2 w-full">
+              {/* ID del Animal */}
+              <div>
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">Codigo Identificación</Label>
+                <Input type="number" name="idAnimal" placeholder="Codigo" required />
+              </div>
+
+              {/* Raza */}
+              <div>
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">Raza</Label>
+                <Select name="raza" required>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona la raza" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="brahman">Brahman</SelectItem>
+                    <SelectItem value="holstein">Holstein</SelectItem>
+                    <SelectItem value="angus">Angus</SelectItem>
+                    <SelectItem value="simmental">Simmental</SelectItem>
+                    <SelectItem value="gyr">Gyr</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Peso */}
+              <div>
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">Peso (kg)</Label>
+                <Input type="number" name="peso" placeholder="Peso (kg)" required />
+              </div>
+
+              {/* Sexo */}
+              <div>
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">Sexo</Label>
+                <Select name="sexo" required>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona el sexo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Macho">Macho</SelectItem>
+                    <SelectItem value="Hembra">Hembra</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Fecha de Nacimiento */}
+              <div className="flex flex-col gap-2">
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Nacimiento</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="justify-start w-full font-normal text-left"
+                    >
+                      <CalendarIcon className="mr-2 w-4 h-4" />
+                      {fechaNacimiento ? format(fechaNacimiento, "yyyy-MM-dd") : "Selecciona fecha"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0">
+                    <Calendar
+                      mode="single"
+                      selected={fechaNacimiento}
+                      onSelect={setFechaNacimiento}
+                      captionLayout="dropdown"
+                      fromYear={2000}
+                      toYear={2030}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Fecha de Último Chequeo */}
+              <div className="flex flex-col gap-2">
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Último Chequeo</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="justify-start w-full font-normal text-left"
+                    >
+                      <CalendarIcon className="mr-2 w-4 h-4" />
+                      {fechaUltimoChequeo ? format(fechaUltimoChequeo, "yyyy-MM-dd") : "Selecciona fecha"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0">
+                    <Calendar
+                      mode="single"
+                      selected={fechaUltimoChequeo}
+                      onSelect={setFechaUltimoChequeo}
+                      captionLayout="dropdown"
+                      fromYear={2000}
+                      toYear={2030}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Estado de Salud */}
+              <div>
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">Estado de Salud</Label>
+                <Select name="estadoSalud" required>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="saludable">Saludable</SelectItem>
+                    <SelectItem value="tratamiento">En Tratamiento</SelectItem>
+                    <SelectItem value="observacion">En Observación</SelectItem>
+                    <SelectItem value="enfermo">Enfermo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Ubicación */}
+              <div>
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">Ubicación</Label>
+                <Select name="ubicacion" required>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="potrero1">Potrero 1</SelectItem>
+                    <SelectItem value="potrero2">Potrero 2</SelectItem>
+                    <SelectItem value="potrero3">Potrero 3</SelectItem>
+                    <SelectItem value="potrero4">Potrero 4</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Observación */}
             <div>
-              <Label className="block mb-1 font-medium text-gray-700 text-sm">Codigo Idenfiticacion</Label>
-              <Input type="number" name="idAnimal" placeholder="Codigo Identificacion" required />
+              <Label className="block mb-1 font-medium text-gray-700 text-sm">Observación</Label>
+              <Textarea name="observacion" placeholder="Notas Adicionales" />
             </div>
 
-            {/* Raza */}
-            <div>
-              <Label className="block mb-1 font-medium text-gray-700 text-sm">Raza</Label>
-              <Select name="raza" required>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecciona la raza" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="brahman">Brahman</SelectItem>
-                  <SelectItem value="holstein">Holstein</SelectItem>
-                  <SelectItem value="angus">Angus</SelectItem>
-                  <SelectItem value="simmental">Simmental</SelectItem>
-                  <SelectItem value="gyr">Gyr</SelectItem>
-                </SelectContent>
-              </Select>
+            {/* Botón */}
+            <div className="text-center">
+              <Button type="submit" className="bg-green-600 hover:bg-green-700 w-full md:w-auto">
+                Registrar Animal
+              </Button>
             </div>
-
-            {/* Peso */}
-            <div>
-              <Label className="block mb-1 font-medium text-gray-700 text-sm">Peso (kg)</Label>
-              <Input type="number" name="peso" placeholder="Peso (kg)" required />
-            </div>
-
-            {/* Sexo */}
-            <div>
-              <Label className="block mb-1 font-medium text-gray-700 text-sm">Sexo</Label>
-              <Select name="sexo" required>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecciona el sexo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Macho">Macho</SelectItem>
-                  <SelectItem value="Hembra">Hembra</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Fecha de Nacimiento */}
-            <div className="flex flex-col gap-2">
-              <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Nacimiento</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="justify-start w-full font-normal text-left"
-                  >
-                    <CalendarIcon className="mr-2 w-4 h-4" />
-                    {fechaNacimiento ? format(fechaNacimiento, "yyyy-MM-dd") : "Selecciona fecha"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="p-0">
-                  <Calendar
-                    mode="single"
-                    selected={fechaNacimiento}
-                    onSelect={setFechaNacimiento}
-                    captionLayout="dropdown"
-                    fromYear={2000}
-                    toYear={2030}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Fecha de Último Chequeo */}
-            <div className="flex flex-col gap-2">
-              <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Último Chequeo</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="justify-start w-full font-normal text-left"
-                  >
-                    <CalendarIcon className="mr-2 w-4 h-4" />
-                    {fechaUltimoChequeo ? format(fechaUltimoChequeo, "yyyy-MM-dd") : "Selecciona fecha"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="p-0">
-                  <Calendar
-                    mode="single"
-                    selected={fechaUltimoChequeo}
-                    onSelect={setFechaUltimoChequeo}
-                    captionLayout="dropdown"
-                    fromYear={2000}
-                    toYear={2030}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Estado de Salud */}
-            <div>
-              <Label className="block mb-1 font-medium text-gray-700 text-sm">Estado de Salud</Label>
-              <Select name="estadoSalud" required>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecciona" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="saludable">Saludable</SelectItem>
-                  <SelectItem value="tratamiento">En Tratamiento</SelectItem>
-                  <SelectItem value="observacion">En Observación</SelectItem>
-                  <SelectItem value="enfermo">Enfermo</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Ubicación */}
-            <div>
-              <Label className="block mb-1 font-medium text-gray-700 text-sm">Ubicación</Label>
-              <Select name="ubicacion" required>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecciona" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="rancho1">Rancho 1</SelectItem>
-                  <SelectItem value="rancho2">Rancho 2</SelectItem>
-                  <SelectItem value="rancho3">Rancho 3</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Observación */}
-          <div>
-            <Label className="block mb-1 font-medium text-gray-700 text-sm">Observación</Label>
-            <Textarea name="observacion" placeholder="Notas Adicionales" />
-          </div>
-
-          {/* Botón */}
-          <div className="text-center">
-            <Button type="submit" className="bg-green-600 hover:bg-green-700 w-full md:w-auto">
-              Registrar Animal
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+          </form>
+        </CardContent>
+      </Card>
+    </>
   )
 }
-

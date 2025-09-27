@@ -1,13 +1,13 @@
 // src/app/prueba/page.tsx
 
 "use client";
-import { useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { useEffect } from "react";
 
 export default function PruebaConexion() {
   useEffect(() => {
     const fetchInventario = async () => {
-      const { data, error } = await supabase.from("inventario").select("*");
+      const { data, error } = await supabase.from("animales").select("*");
       if (error) {
         console.error("Error de conexión:", error.message);
       } else {
@@ -18,5 +18,5 @@ export default function PruebaConexion() {
     fetchInventario();
   }, []);
 
-  return <div className="text-xl p-8">Revisa la consola 🔍</div>;
+  return <div className="p-8 text-xl">Revisa la consola 🔍</div>;
 }

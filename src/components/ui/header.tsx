@@ -12,6 +12,8 @@ function getSectionTitle(pathname: string) {
     "/inventario": "Inventario",
     "/registro_alimentacion": "Registro de Alimentación",
     "/reporte_consumo": "Reporte de Consumo de Alimento",
+    "/registro_ganado": "Registro de Ganado",
+    "/ganado": "Ganado",
   };
   return sectionTitles[pathname] || "Panel de Control";
 }
@@ -21,10 +23,10 @@ export default function Header() {
   const activeSection = getSectionTitle(pathname);
 
   return (
-  <header className="flex items-center justify-start mb-4">
-    <SidebarTrigger className="w-12 h-12 p-2 border rounded-lg hover:bg-gray-100" />
+  <header className="flex justify-start items-center mb-4">
+    <SidebarTrigger className="hover:bg-gray-100 p-2 border rounded-lg w-12 h-12" />
     <SeparatorVerticalIcon className="mx-4 h-8" />
-    <h1 className="text-3xl font-bold">{activeSection}</h1>
+    <h1 className="font-bold text-3xl">{activeSection}</h1>
   </header>
 );
 

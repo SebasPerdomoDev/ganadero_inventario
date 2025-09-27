@@ -1,188 +1,207 @@
-"use client";
 
-import { supabase } from "@/lib/supabase";
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { supabase } from "@/lib/supabase"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import * as React from "react"
 
 export default function Ganado() {
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const [fechaNacimiento, setFechaNacimiento] = React.useState<Date | undefined>()
+  const [fechaUltimoChequeo, setFechaUltimoChequeo] = React.useState<Date | undefined>()
 
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const form = e.target as HTMLFormElement
+    const formData = new FormData(form)
 
     const data = {
-      id_animal: formData.get("idAnimal"),
+      codigo_identificacion: formData.get("idAnimal"),
       raza: formData.get("raza"),
       peso: Number(formData.get("peso")),
       sexo: formData.get("sexo"),
-      fecha_nacimiento: formData.get("fechaNacimiento"),
-      fecha_ultimo_chequeo: formData.get("fechaUltimoChequeo"),
+      fecha_nacimiento: fechaNacimiento ? format(fechaNacimiento, "yyyy-MM-dd") : null,
+      fecha_ultimo_chequeo: fechaUltimoChequeo ? format(fechaUltimoChequeo, "yyyy-MM-dd") : null,
       estado_salud: formData.get("estadoSalud"),
       ubicacion: formData.get("ubicacion"),
       observacion: formData.get("observacion"),
-    };
-
-    const { error } = await supabase.from("ganado").insert([data]);
-
-    if (error) {
-      console.error("❌ Error al registrar:", error.message);
-      alert("Hubo un error al guardar el animal");
-    } else {
-      console.log("✅ Registro guardado:", data);
-      alert("Animal registrado con éxito");
-      form.reset();
     }
-  };
+
+    const { error } = await supabase.from("animales").insert([data])
+    if (error) {
+      console.error("❌ Error al registrar:", error.message)
+      alert("Hubo un error al guardar el animal")
+    } else {
+      alert("Animal registrado con éxito")
+      form.reset()
+      setFechaNacimiento(undefined)
+      setFechaUltimoChequeo(undefined)
+    }
+  }
 
   return (
-    <section className="bg-white shadow-lg mx-auto mt-10 p-6 border border-gray-200 rounded-xl max-w-3xl">
-      {/* Header */}
-      <header className="mb-6 text-center">
-        <h1 className="font-bold text-cyan-700 text-3xl">Registro de Ganado 🐄</h1>
-        <span className="text-gray-600 text-sm">
-          Completa la información del nuevo animal
-        </span>
-      </header>
+    <Card className="shadow-lg mx-auto mt-5 w-full">
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-5 w-full">
+          <h2 className="mb-4 pb-2 border-b font-semibold text-gray-800 text-xl">Información Animal</h2>
 
-      {/* Formulario */}
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <h2 className="mb-4 pb-2 border-b font-semibold text-gray-800 text-xl">
-          Información Animal
-        </h2>
+          <div className="gap-4 grid md:grid-cols-2 w-full">
+            {/* ID del Animal */}
+            <div>
+              <Label className="block mb-1 font-medium text-gray-700 text-sm">Codigo Idenfiticacion</Label>
+              <Input type="number" name="idAnimal" placeholder="Codigo Identificacion" required />
+            </div>
 
-        {/* Grid de inputs */}
-        <div className="gap-6 grid grid-cols-1 md:grid-cols-2">
-          <div>
-            <label className="block font-medium text-gray-700 text-sm">
-              ID del Animal
-            </label>
-            <input
-              type="number"
-              name="idAnimal"
-              placeholder="ID del Animal"
-              required
-              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full"
-            />
+            {/* Raza */}
+            <div>
+              <Label className="block mb-1 font-medium text-gray-700 text-sm">Raza</Label>
+              <Select name="raza" required>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecciona la raza" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="brahman">Brahman</SelectItem>
+                  <SelectItem value="holstein">Holstein</SelectItem>
+                  <SelectItem value="angus">Angus</SelectItem>
+                  <SelectItem value="simmental">Simmental</SelectItem>
+                  <SelectItem value="gyr">Gyr</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Peso */}
+            <div>
+              <Label className="block mb-1 font-medium text-gray-700 text-sm">Peso (kg)</Label>
+              <Input type="number" name="peso" placeholder="Peso (kg)" required />
+            </div>
+
+            {/* Sexo */}
+            <div>
+              <Label className="block mb-1 font-medium text-gray-700 text-sm">Sexo</Label>
+              <Select name="sexo" required>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecciona el sexo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Macho">Macho</SelectItem>
+                  <SelectItem value="Hembra">Hembra</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Fecha de Nacimiento */}
+            <div className="flex flex-col gap-2">
+              <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Nacimiento</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="justify-start w-full font-normal text-left"
+                  >
+                    <CalendarIcon className="mr-2 w-4 h-4" />
+                    {fechaNacimiento ? format(fechaNacimiento, "yyyy-MM-dd") : "Selecciona fecha"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0">
+                  <Calendar
+                    mode="single"
+                    selected={fechaNacimiento}
+                    onSelect={setFechaNacimiento}
+                    captionLayout="dropdown"
+                    fromYear={2000}
+                    toYear={2030}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Fecha de Último Chequeo */}
+            <div className="flex flex-col gap-2">
+              <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Último Chequeo</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="justify-start w-full font-normal text-left"
+                  >
+                    <CalendarIcon className="mr-2 w-4 h-4" />
+                    {fechaUltimoChequeo ? format(fechaUltimoChequeo, "yyyy-MM-dd") : "Selecciona fecha"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0">
+                  <Calendar
+                    mode="single"
+                    selected={fechaUltimoChequeo}
+                    onSelect={setFechaUltimoChequeo}
+                    captionLayout="dropdown"
+                    fromYear={2000}
+                    toYear={2030}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Estado de Salud */}
+            <div>
+              <Label className="block mb-1 font-medium text-gray-700 text-sm">Estado de Salud</Label>
+              <Select name="estadoSalud" required>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecciona" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="saludable">Saludable</SelectItem>
+                  <SelectItem value="tratamiento">En Tratamiento</SelectItem>
+                  <SelectItem value="observacion">En Observación</SelectItem>
+                  <SelectItem value="enfermo">Enfermo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Ubicación */}
+            <div>
+              <Label className="block mb-1 font-medium text-gray-700 text-sm">Ubicación</Label>
+              <Select name="ubicacion" required>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecciona" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="rancho1">Rancho 1</SelectItem>
+                  <SelectItem value="rancho2">Rancho 2</SelectItem>
+                  <SelectItem value="rancho3">Rancho 3</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
+          {/* Observación */}
           <div>
-            <label className="block font-medium text-gray-700 text-sm">
-              Raza
-            </label>
-            <input
-              type="text"
-              name="raza"
-              placeholder="Raza"
-              required
-              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full"
-            />
+            <Label className="block mb-1 font-medium text-gray-700 text-sm">Observación</Label>
+            <Textarea name="observacion" placeholder="Notas Adicionales" />
           </div>
 
-          <div>
-            <label className="block font-medium text-gray-700 text-sm">
-              Peso (kg)
-            </label>
-            <input
-              type="number"
-              name="peso"
-              placeholder="Peso (kg)"
-              required
-              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full"
-            />
+          {/* Botón */}
+          <div className="text-center">
+            <Button type="submit" className="bg-green-600 hover:bg-green-700 w-full md:w-auto">
+              Registrar Animal
+            </Button>
           </div>
-
-          <div>
-            <label className="block font-medium text-gray-700 text-sm">Sexo</label>
-            <select
-              name="sexo"
-              required
-              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full"
-            >
-              <option value="">Selecciona el sexo</option>
-              <option value="macho">Macho</option>
-              <option value="hembra">Hembra</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block font-medium text-gray-700 text-sm">
-              Fecha de Nacimiento
-            </label>
-            <input
-              type="date"
-              name="fechaNacimiento"
-              required
-              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full cursor-pointer"
-            />
-          </div>
-
-          <div>
-            <label className="block font-medium text-gray-700 text-sm">
-              Fecha de Último Chequeo
-            </label>
-            <input
-              type="date"
-              name="fechaUltimoChequeo"
-              required
-              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full cursor-pointer"
-            />
-          </div>
-
-          <div>
-            <label className="block font-medium text-gray-700 text-sm">
-              Estado de Salud
-            </label>
-            <select
-              name="estadoSalud"
-              required
-              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full cursor-pointer"
-            >
-              <option value="">Selecciona</option>
-              <option value="saludable">Saludable</option>
-              <option value="tratamiento">En Tratamiento</option>
-              <option value="observacion">En Observación</option>
-              <option value="enfermo">Enfermo</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block font-medium text-gray-700 text-sm">
-              Ubicación
-            </label>
-            <select
-              name="ubicacion"
-              required
-              className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full cursor-pointer"
-            >
-              <option value="">Selecciona</option>
-              <option value="rancho1">Rancho 1</option>
-              <option value="rancho2">Rancho 2</option>
-              <option value="rancho3">Rancho 3</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Observaciones */}
-        <div>
-          <label className="block font-medium text-gray-700 text-sm">
-            Observación
-          </label>
-          <textarea
-            name="observacion"
-            placeholder="Notas Adicionales"
-            className="mt-1 p-2 border focus:border-cyan-500 rounded-lg focus:ring-2 focus:ring-cyan-500 w-full"
-          />
-        </div>
-
-
-        <div className="text-center">
-          <button
-            type="submit"
-            className="bg-green-600 hover:bg-green-700 shadow px-6 py-2 rounded-lg font-semibold text-white transition cursor-pointer"
-          >
-            Registrar Animal
-          </button>
-        </div>
-      </form>
-    </section>
-  );
+        </form>
+      </CardContent>
+    </Card>
+  )
 }
+

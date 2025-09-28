@@ -1,9 +1,4 @@
 "use client"
-import { ChartColumn,NotebookPen, Fish, Package , } from "lucide-react"
-import { PiCowFill } from "react-icons/pi";
-import { FaClipboardList } from "react-icons/fa";
-import { MdSpaceDashboard } from "react-icons/md";
-import Link from "next/link"
 import {
   Sidebar,
   SidebarContent,
@@ -13,11 +8,14 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarSeparator,
-} from "@/components/ui/sidebar"
-import { use } from "react"
-import { usePathname } from "next/navigation"
+  SidebarMenuItem
+} from "@/components/ui/sidebar";
+import { ChartColumn, NotebookPen, Package } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { FaClipboardList } from "react-icons/fa";
+import { MdSpaceDashboard } from "react-icons/md";
+import { PiCowFill } from "react-icons/pi";
 
 // Menu items.
 const items = [
@@ -32,7 +30,7 @@ const items = [
     icon: PiCowFill,
   },
   {
-    title: "Ganado",
+    title: "Ganado Registrado",
     url: "/ganado",
     icon: FaClipboardList,
   },
@@ -51,7 +49,7 @@ const items = [
     url: "/reporte_consumo",
     icon: ChartColumn,
   },
-  
+
 ]
 
 export function AppSidebar() {
@@ -59,7 +57,7 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        
+
         <SidebarGroup>
           <SidebarGroupLabel>
             <div className="flex items-center gap-3 mt-2">
@@ -70,9 +68,9 @@ export function AppSidebar() {
             </div>
 
           </SidebarGroupLabel>
-          
+
           <SidebarGroupContent>
-            
+
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarContent>
@@ -84,9 +82,8 @@ export function AppSidebar() {
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
                       <Link href={item.url}
-                      className={`flex items-center gap-2 px-2 py-1 rounded ${
-                          pathname.startsWith(item.url) ? 'bg-gray-200 font-semibold' : ''
-                        }`}>
+                        className={`flex items-center gap-2 px-2 py-1 rounded ${pathname.startsWith(item.url) ? 'bg-gray-200 font-semibold' : ''
+                          }`}>
                         <item.icon />
                         <span className="active:font-medium">{item.title}</span>
                       </Link>

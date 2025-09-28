@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/table";
 import { Edit, Eye, Trash2 } from "lucide-react";
 
+// Definición del tipo Animal
 type Animal = {
   id: number;
   codigo_identificacion: string;
@@ -47,35 +48,39 @@ type Animal = {
 };
 
 export default function AnimalesTable() {
-  const [animales, setAnimales] = useState<Animal[]>([]);
-  const [animalesFiltrados, setAnimalesFiltrados] = useState<Animal[]>([]);
-  const [loading, setLoading] = useState(true);
+  // ===== Estados principales =====
+  const [animales, setAnimales] = useState<Animal[]>([]); // Todos los animales cargados
+  const [animalesFiltrados, setAnimalesFiltrados] = useState<Animal[]>([]); // Animales después de aplicar filtros
+  const [loading, setLoading] = useState(true); // Estado de carga
 
-  const [openView, setOpenView] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
-  const [openDelete, setOpenDelete] = useState(false);
-  const [animalSeleccionado, setAnimalSeleccionado] = useState<Animal | null>(null);
+  // ===== Modales y selección =====
+  const [openView, setOpenView] = useState(false); // Modal de observaciones
+  const [openEdit, setOpenEdit] = useState(false); // Modal de edición
+  const [openDelete, setOpenDelete] = useState(false); // Modal de eliminación
+  const [animalSeleccionado, setAnimalSeleccionado] = useState<Animal | null>(null); // Animal actualmente seleccionado
 
-  const [form, setForm] = useState<Partial<Animal>>({});
+  // ===== Formulario de edición =====
+  const [form, setForm] = useState<Partial<Animal>>({}); // Estado parcial del formulario para editar
 
-  // Filtros
-  const [buscarCodigo, setBuscarCodigo] = useState("");
-  const [filtroSexo, setFiltroSexo] = useState("todos");
-  const [filtroRaza, setFiltroRaza] = useState("todos");
-  const [filtroUbicacion, setFiltroUbicacion] = useState("todos");
-  const [filtroEstadoSalud, setFiltroEstadoSalud] = useState("todos");
+  // ===== Filtros =====
+  const [buscarCodigo, setBuscarCodigo] = useState(""); // Filtro por código de identificación
+  const [filtroSexo, setFiltroSexo] = useState("todos"); // Filtro por sexo
+  const [filtroRaza, setFiltroRaza] = useState("todos"); // Filtro por raza
+  const [filtroUbicacion, setFiltroUbicacion] = useState("todos"); // Filtro por ubicación
+  const [filtroEstadoSalud, setFiltroEstadoSalud] = useState("todos"); // Filtro por estado de salud
+  const [ordenPeso, setOrdenPeso] = useState<"ninguno" | "asc" | "desc">("ninguno"); // Orden de peso
 
-  // Paginación
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
+  // ===== Paginación =====
+  const [currentPage, setCurrentPage] = useState(1); // Página actual
+  const itemsPerPage = 9; // Número de items por página
 
-  // Cargar animales
+  // ===== Cargar animales desde Supabase =====
   useEffect(() => {
     const fetchAnimales = async () => {
       const { data, error } = await supabase
         .from("animales")
         .select("*")
-        .order("codigo_identificacion", { ascending: true });
+        .order("codigo_identificacion", { ascending: true }); // Orden por código ascendente
       if (error) {
         console.error("Error cargando animales:", error.message);
       } else {
@@ -87,19 +92,41 @@ export default function AnimalesTable() {
     fetchAnimales();
   }, []);
 
-  // Filtrar
+  // ===== Aplicar filtros y orden =====
   useEffect(() => {
     let filtrados = [...animales];
-    if (buscarCodigo) filtrados = filtrados.filter(a => a.codigo_identificacion.toLowerCase().includes(buscarCodigo.toLowerCase()));
-    if (filtroSexo !== "todos") filtrados = filtrados.filter(a => a.sexo === filtroSexo);
-    if (filtroRaza !== "todos") filtrados = filtrados.filter(a => a.raza === filtroRaza);
-    if (filtroUbicacion !== "todos") filtrados = filtrados.filter(a => a.ubicacion === filtroUbicacion);
-    if (filtroEstadoSalud !== "todos") filtrados = filtrados.filter(a => a.estado_salud === filtroEstadoSalud);
-    setAnimalesFiltrados(filtrados);
-    setCurrentPage(1);
-  }, [buscarCodigo, filtroSexo, filtroRaza, filtroUbicacion, filtroEstadoSalud, animales]);
 
-  // Editar
+    // Filtrar por código
+    if (buscarCodigo)
+      filtrados = filtrados.filter(a =>
+        a.codigo_identificacion.toLowerCase().includes(buscarCodigo.toLowerCase())
+      );
+
+    // Filtrar por sexo
+    if (filtroSexo !== "todos")
+      filtrados = filtrados.filter(a => a.sexo === filtroSexo);
+
+    // Filtrar por raza
+    if (filtroRaza !== "todos")
+      filtrados = filtrados.filter(a => a.raza === filtroRaza);
+
+    // Filtrar por ubicación
+    if (filtroUbicacion !== "todos")
+      filtrados = filtrados.filter(a => a.ubicacion === filtroUbicacion);
+
+    // Filtrar por estado de salud
+    if (filtroEstadoSalud !== "todos")
+      filtrados = filtrados.filter(a => a.estado_salud === filtroEstadoSalud);
+
+    // Ordenar por peso
+    if (ordenPeso === "asc") filtrados.sort((a, b) => a.peso - b.peso);
+    else if (ordenPeso === "desc") filtrados.sort((a, b) => b.peso - a.peso);
+
+    setAnimalesFiltrados(filtrados);
+    setCurrentPage(1); // Reiniciar a la primera página
+  }, [buscarCodigo, filtroSexo, filtroRaza, ordenPeso, filtroUbicacion, filtroEstadoSalud, animales]);
+
+  // ===== Editar animal =====
   const handleEdit = (animal: Animal) => {
     setAnimalSeleccionado(animal);
     setForm(animal);
@@ -123,6 +150,7 @@ export default function AnimalesTable() {
     if (error) toast.error("❌ No se pudo actualizar el animal");
     else {
       const updated = { ...animalSeleccionado, ...form } as Animal;
+      // Actualizar estados locales
       setAnimales(prev => prev.map(a => (a.id === animalSeleccionado.id ? updated : a)));
       setAnimalesFiltrados(prev => prev.map(a => (a.id === animalSeleccionado.id ? updated : a)));
       setOpenEdit(false);
@@ -130,12 +158,13 @@ export default function AnimalesTable() {
     }
   };
 
-  // Borrar
+  // ===== Borrar animal =====
   const handleDelete = async () => {
     if (!animalSeleccionado) return;
     const { error } = await supabase.from("animales").delete().eq("id", animalSeleccionado.id);
     if (error) toast.error("❌ No se pudo eliminar el animal");
     else {
+      // Actualizar estados locales
       setAnimales(prev => prev.filter(a => a.id !== animalSeleccionado.id));
       setAnimalesFiltrados(prev => prev.filter(a => a.id !== animalSeleccionado.id));
       setOpenDelete(false);
@@ -143,7 +172,7 @@ export default function AnimalesTable() {
     }
   };
 
-  // Paginación
+  // ===== Paginación =====
   const totalPages = Math.ceil(animalesFiltrados.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -153,16 +182,20 @@ export default function AnimalesTable() {
 
   return (
     <div className="mt-5">
-      {/* Filtros */}
+      {/* ================= FILTROS ================= */}
       <div className="flex md:flex-row flex-col items-center gap-2 mb-4">
+        {/* Filtro por código */}
         <Input
-          placeholder="Buscar por ID"
+          placeholder="Buscar por Código de identificación"
           value={buscarCodigo}
           onChange={(e) => setBuscarCodigo(e.target.value)}
           className="md:w-1/4"
         />
+
         <div className="flex flex-row items-center gap-4">
-          <Label>Filtros:</Label>
+          <Label>Filtrar Sexo | Raza | Peso | Estado Salud | Ubicacion </Label>
+
+          {/* Filtro por sexo */}
           <Select value={filtroSexo} onValueChange={setFiltroSexo}>
             <SelectTrigger><SelectValue placeholder="Sexo" /></SelectTrigger>
             <SelectContent>
@@ -171,6 +204,8 @@ export default function AnimalesTable() {
               <SelectItem value="hembra">Hembra</SelectItem>
             </SelectContent>
           </Select>
+
+          {/* Filtro por raza */}
           <Select value={filtroRaza} onValueChange={setFiltroRaza}>
             <SelectTrigger><SelectValue placeholder="Raza" /></SelectTrigger>
             <SelectContent>
@@ -182,6 +217,18 @@ export default function AnimalesTable() {
               <SelectItem value="gyr">Gyr</SelectItem>
             </SelectContent>
           </Select>
+
+          {/* Orden por peso */}
+          <Select value={ordenPeso} onValueChange={value => setOrdenPeso(value as "ninguno" | "asc" | "desc")}>
+            <SelectTrigger><SelectValue placeholder="Ordenar peso" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ninguno">Sin ordenar</SelectItem>
+              <SelectItem value="asc">Menor a mayor</SelectItem>
+              <SelectItem value="desc">Mayor a menor</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Filtro por estado de salud */}
           <Select value={filtroEstadoSalud} onValueChange={setFiltroEstadoSalud}>
             <SelectTrigger><SelectValue placeholder="Estado salud" /></SelectTrigger>
             <SelectContent>
@@ -191,6 +238,8 @@ export default function AnimalesTable() {
               <SelectItem value="enfermo">Enfermo</SelectItem>
             </SelectContent>
           </Select>
+
+          {/* Filtro por ubicación */}
           <Select value={filtroUbicacion} onValueChange={setFiltroUbicacion}>
             <SelectTrigger><SelectValue placeholder="Ubicación" /></SelectTrigger>
             <SelectContent>
@@ -204,7 +253,7 @@ export default function AnimalesTable() {
         </div>
       </div>
 
-      {/* Tabla */}
+      {/* ================= TABLA ================= */}
       <Table>
         <TableHeader className="font-bold text-xl">
           <TableRow>
@@ -234,6 +283,7 @@ export default function AnimalesTable() {
                 <TableCell>{animal.estado_salud}</TableCell>
                 <TableCell>{animal.ubicacion}</TableCell>
                 <TableCell className="flex justify-center gap-2">
+                  {/* Botones de acciones */}
                   <Button size="icon" variant="ghost" onClick={() => { setAnimalSeleccionado(animal); setOpenView(true); }}>
                     <Eye className="w-4 h-4" />
                   </Button>
@@ -250,7 +300,7 @@ export default function AnimalesTable() {
         </TableBody>
       </Table>
 
-      {/* Paginación */}
+      {/* ================= PAGINACIÓN ================= */}
       {totalPages > 1 && (
         <div className="flex justify-center mt-4">
           <Pagination>
@@ -275,7 +325,7 @@ export default function AnimalesTable() {
 
       {/* ================= MODALES ================= */}
 
-      {/* Observaciones */}
+      {/* Modal Observaciones */}
       <Dialog open={openView} onOpenChange={setOpenView}>
         <DialogContent>
           <DialogHeader>
@@ -287,16 +337,17 @@ export default function AnimalesTable() {
         </DialogContent>
       </Dialog>
 
-      {/* Editar */}
+      {/* Modal Editar */}
       <Dialog open={openEdit} onOpenChange={setOpenEdit}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar Animal</DialogTitle>
           </DialogHeader>
           <div className="gap-4 grid py-4">
+            {/* Campos del formulario de edición */}
             <div className="items-center gap-2 grid grid-cols-4">
               <Label className="text-right">Raza</Label>
-              <Select value={form.raza || "brahman"} onValueChange={value => setForm({ ...form, raza: value })} className="col-span-3">
+              <Select value={form.raza || "brahman"} onValueChange={value => setForm({ ...form, raza: value })} >
                 <SelectTrigger><SelectValue placeholder="Selecciona raza" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="brahman">Brahman</SelectItem>
@@ -309,7 +360,7 @@ export default function AnimalesTable() {
             </div>
             <div className="items-center gap-2 grid grid-cols-4">
               <Label className="text-right">Sexo</Label>
-              <Select value={form.sexo || "macho"} onValueChange={value => setForm({ ...form, sexo: value })} className="col-span-3">
+              <Select value={form.sexo || "macho"} onValueChange={value => setForm({ ...form, sexo: value })} >
                 <SelectTrigger><SelectValue placeholder="Selecciona sexo" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="macho">Macho</SelectItem>
@@ -323,7 +374,7 @@ export default function AnimalesTable() {
             </div>
             <div className="items-center gap-2 grid grid-cols-4">
               <Label className="text-right">Estado Salud</Label>
-              <Select value={form.estado_salud || "saludable"} onValueChange={value => setForm({ ...form, estado_salud: value })} className="col-span-3">
+              <Select value={form.estado_salud || "saludable"} onValueChange={value => setForm({ ...form, estado_salud: value })}>
                 <SelectTrigger><SelectValue placeholder="Selecciona estado" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="saludable">Saludable</SelectItem>
@@ -334,7 +385,7 @@ export default function AnimalesTable() {
             </div>
             <div className="items-center gap-2 grid grid-cols-4">
               <Label className="text-right">Ubicación</Label>
-              <Select value={form.ubicacion || "potrero 1"} onValueChange={value => setForm({ ...form, ubicacion: value })} className="col-span-3">
+              <Select value={form.ubicacion || "potrero 1"} onValueChange={value => setForm({ ...form, ubicacion: value })} >
                 <SelectTrigger><SelectValue placeholder="Seleccione ubicación" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="potrero 1">Potrero 1</SelectItem>
@@ -355,7 +406,7 @@ export default function AnimalesTable() {
         </DialogContent>
       </Dialog>
 
-      {/* Eliminar */}
+      {/* Modal Eliminar */}
       <Dialog open={openDelete} onOpenChange={setOpenDelete}>
         <DialogContent>
           <DialogHeader>

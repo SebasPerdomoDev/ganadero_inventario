@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,12 +16,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { supabase } from "@/lib/supabase";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 // ✅ CAMBIO 1: id como string (UUID)
 interface InventarioItem {
   id: string;
   nombre: string;
-  
+
   cantidad: number;
   marca: string;
   vencimiento: string;
@@ -40,7 +40,7 @@ export default function InventoryPage() {
 
   const [formData, setFormData] = useState({
     nombre: "",
-    
+
     cantidad: "",
     marca: "",
     vencimiento: "",
@@ -73,7 +73,7 @@ export default function InventoryPage() {
     const { error } = await supabase.from("inventario").insert([
       {
         nombre: formData.nombre,
-    
+
         cantidad: parseFloat(formData.cantidad),
         marca: formData.marca,
         vencimiento: formData.vencimiento,
@@ -88,7 +88,7 @@ export default function InventoryPage() {
       toast.success("Producto agregado exitosamente.");
       setFormData({
         nombre: "",
-        
+
         cantidad: "",
         marca: "",
         vencimiento: "",
@@ -155,9 +155,9 @@ export default function InventoryPage() {
     );
 
   return (
-    <div className="space-y-6 w-full max-w-7xl min-h-full mx-auto">
+    <div className="space-y-6 mx-auto w-full max-w-7xl min-h-full">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Gestión de Inventario</h1>
+        <h1 className="font-bold text-2xl">Gestión de Inventario</h1>
         <div className="flex gap-2">
           <Button onClick={() => setIsDialogOpen(true)}>+ Agregar Producto</Button>
           <Button variant="outline" onClick={() => setIsRestockDialogOpen(true)}>🔄 Reabastecer</Button>
@@ -183,27 +183,26 @@ export default function InventoryPage() {
         </Select>
       </div>
 
-      <div className="bg-white rounded-lg p-4 shadow-md overflow-x-auto overflow-y-auto max-h-[500px]">
+      <div className="bg-white shadow-md p-4 rounded-lg max-h-[500px] overflow-x-auto overflow-y-auto">
         <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-100 sticky top-[-20px] z-10">
+          <thead className="top-[-20px] z-10 sticky bg-gray-100">
             <tr className="border-b">
-              <th className="py-2 px-4">Tipo de Alimento</th>
-              
-              <th className="py-2 px-4">Cantidad (kg)</th>
-              <th className="py-2 px-4">Marca</th>
-              <th className="py-2 px-4">Fecha de Vencimiento</th>
-              <th className="py-2 px-4">Lote</th>
+              <th className="px-4 py-2">Tipo de Alimento</th>
+
+              <th className="px-4 py-2">Cantidad (kg)</th>
+              <th className="px-4 py-2">Marca</th>
+              <th className="px-4 py-2">Fecha de Vencimiento</th>
+              <th className="px-4 py-2">Lote</th>
             </tr>
           </thead>
           <tbody>
             {filteredInventory.map((item) => (
               <tr key={item.id} className="border-b">
-                <td className="py-2 px-4">{item.nombre}</td>
-                
-                <td className="py-2 px-4 font-bold">{item.cantidad}</td>
-                <td className="py-2 px-4">{item.marca}</td>
-                <td className="py-2 px-4">{item.vencimiento}</td>
-                <td className="py-2 px-4">{item.lote}</td>
+                <td className="px-4 py-2">{item.nombre}</td>
+                <td className="px-4 py-2 font-bold">{item.cantidad}</td>
+                <td className="px-4 py-2">{item.marca}</td>
+                <td className="px-4 py-2">{item.vencimiento}</td>
+                <td className="px-4 py-2">{item.lote}</td>
               </tr>
             ))}
           </tbody>
@@ -220,26 +219,26 @@ export default function InventoryPage() {
 
           <div className="space-y-4">
             <Select value={formData.nombre} onValueChange={(value) => setFormData({ ...formData, nombre: value })}>
-  <SelectTrigger>
-    <SelectValue placeholder="Selecciona tipo de alimento" />
-  </SelectTrigger>
-  <SelectContent>
-    {[
-      "45% HARINA",
-      "45% INICIACION",
-      "38% 1.8 mm",
-      "34% 3 mm",
-      "32% 2.5 mm",
-      "32% 3.5 mm",
-      "32% 4.7 mm",
-      "28% 4.7 mm",
-    ].map((tipo) => (
-      <SelectItem key={tipo} value={tipo}>
-        {tipo}
-      </SelectItem>
-    ))}
-  </SelectContent>
-</Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona tipo de alimento" />
+              </SelectTrigger>
+              <SelectContent>
+                {[
+                  "45% HARINA",
+                  "45% INICIACION",
+                  "38% 1.8 mm",
+                  "34% 3 mm",
+                  "32% 2.5 mm",
+                  "32% 3.5 mm",
+                  "32% 4.7 mm",
+                  "28% 4.7 mm",
+                ].map((tipo) => (
+                  <SelectItem key={tipo} value={tipo}>
+                    {tipo}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             <Input placeholder="Cantidad (kg)" name="cantidad" value={formData.cantidad} onChange={handleInputChange} />
             <Input placeholder="Marca" name="marca" value={formData.marca} onChange={handleInputChange} />

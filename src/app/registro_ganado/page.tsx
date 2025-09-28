@@ -86,7 +86,7 @@ export default function Ganado() {
               {/* Peso */}
               <div>
                 <Label className="block mb-1 font-medium text-gray-700 text-sm">Peso (kg)</Label>
-                <Input type="number" name="peso" placeholder="Peso (kg)" required />
+                <Input type="number" name="peso" placeholder="Peso (kg)" step="0.01" required />
               </div>
 
               {/* Sexo */}
@@ -97,8 +97,8 @@ export default function Ganado() {
                     <SelectValue placeholder="Selecciona el sexo" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Macho">Macho</SelectItem>
-                    <SelectItem value="Hembra">Hembra</SelectItem>
+                    <SelectItem value="macho">Macho</SelectItem>
+                    <SelectItem value="hembra">Hembra</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -181,10 +181,10 @@ export default function Ganado() {
                     <SelectValue placeholder="Selecciona" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="potrero1">Potrero 1</SelectItem>
-                    <SelectItem value="potrero2">Potrero 2</SelectItem>
-                    <SelectItem value="potrero3">Potrero 3</SelectItem>
-                    <SelectItem value="potrero4">Potrero 4</SelectItem>
+                    <SelectItem value="potrero 1">Potrero 1</SelectItem>
+                    <SelectItem value="potrero 2">Potrero 2</SelectItem>
+                    <SelectItem value="potrero 3">Potrero 3</SelectItem>
+                    <SelectItem value="potrero 4">Potrero 4</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

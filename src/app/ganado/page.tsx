@@ -188,7 +188,7 @@ export default function AnimalesTable() {
 
         {/* Sexo */}
         <div className="flex flex-row items-center gap-4">
-          <Label>Filtrar por sexo</Label>
+          <Label>Filtrar por sexo | raza | estado salud | ubicacion</Label>
           <Select
             value={filtroSexo || ""}
             onValueChange={setFiltroSexo}

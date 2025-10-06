@@ -99,7 +99,7 @@ export default function AnimalesTable() {
     // Filtrar por código
     if (buscarCodigo)
       filtrados = filtrados.filter(a =>
-        a.codigo_identificacion.toLowerCase().includes(buscarCodigo.toLowerCase())
+        a.codigo_identificacion.toString().includes(buscarCodigo)
       );
 
     // Filtrar por sexo
@@ -275,7 +275,7 @@ export default function AnimalesTable() {
             </TableRow>
           ) : (
             animalesPaginados.map((animal) => (
-              <TableRow key={animal.id}>
+              <TableRow className="capitalize" key={animal.id}>
                 <TableCell>{animal.codigo_identificacion}</TableCell>
                 <TableCell>{animal.raza}</TableCell>
                 <TableCell>{animal.peso}</TableCell>
@@ -284,10 +284,10 @@ export default function AnimalesTable() {
                 <TableCell>{animal.ubicacion}</TableCell>
                 <TableCell className="flex justify-center gap-2">
                   {/* Botones de acciones */}
-                  <Button size="icon" variant="ghost" onClick={() => { setAnimalSeleccionado(animal); setOpenView(true); }}>
+                  <Button size="icon" variant="secondary" onClick={() => { setAnimalSeleccionado(animal); setOpenView(true); }}>
                     <Eye className="w-4 h-4" />
                   </Button>
-                  <Button size="icon" variant="secondary" onClick={() => handleEdit(animal)}>
+                  <Button size="icon" variant="outline" onClick={() => handleEdit(animal)}>
                     <Edit className="w-4 h-4" />
                   </Button>
                   <Button size="icon" variant="destructive" onClick={() => { setAnimalSeleccionado(animal); setOpenDelete(true); }}>
@@ -329,13 +329,28 @@ export default function AnimalesTable() {
       <Dialog open={openView} onOpenChange={setOpenView}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Observaciones</DialogTitle>
+            <DialogTitle>Detalles del Animal</DialogTitle>
           </DialogHeader>
-          <div className="mt-2">
-            <p>{animalSeleccionado?.observacion || "No hay observaciones registradas para este animal."}</p>
+          <div className="space-y-3 mt-2 capitalize">
+            <p>
+              <strong>Último Chequeo:</strong>{" "}
+              {animalSeleccionado?.fecha_ultimo_chequeo
+                ? new Date(animalSeleccionado.fecha_ultimo_chequeo).toLocaleDateString()
+                : "No registrado"}
+            </p>
+            <p>
+              <strong>Estado de Salud:</strong>{" "}
+              {animalSeleccionado?.estado_salud || "No registrado"}
+            </p>
+            <p>
+              <strong>Observación:</strong>{" "}
+              {animalSeleccionado?.observacion || "No hay observaciones registradas para este animal."}
+            </p>
           </div>
         </DialogContent>
       </Dialog>
+
+
 
       {/* Modal Editar */}
       <Dialog open={openEdit} onOpenChange={setOpenEdit}>
@@ -347,8 +362,13 @@ export default function AnimalesTable() {
             {/* Campos del formulario de edición */}
             <div className="items-center gap-2 grid grid-cols-4">
               <Label className="text-right">Raza</Label>
-              <Select value={form.raza || "brahman"} onValueChange={value => setForm({ ...form, raza: value })} >
-                <SelectTrigger><SelectValue placeholder="Selecciona raza" /></SelectTrigger>
+              <Select
+                value={form.raza || ""}
+                onValueChange={(value) => setForm({ ...form, raza: value })}
+              >
+                <SelectTrigger className="col-span-3 w-full">
+                  <SelectValue placeholder="Selecciona raza" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="brahman">Brahman</SelectItem>
                   <SelectItem value="holstein">Holstein</SelectItem>
@@ -358,24 +378,44 @@ export default function AnimalesTable() {
                 </SelectContent>
               </Select>
             </div>
+
             <div className="items-center gap-2 grid grid-cols-4">
               <Label className="text-right">Sexo</Label>
-              <Select value={form.sexo || "macho"} onValueChange={value => setForm({ ...form, sexo: value })} >
-                <SelectTrigger><SelectValue placeholder="Selecciona sexo" /></SelectTrigger>
+              <Select
+                value={form.sexo || ""}
+                onValueChange={(value) => setForm({ ...form, sexo: value })}
+              >
+                <SelectTrigger className="col-span-3 w-full">
+                  <SelectValue placeholder="Selecciona sexo" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="macho">Macho</SelectItem>
                   <SelectItem value="hembra">Hembra</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
             <div className="items-center gap-2 grid grid-cols-4">
               <Label className="text-right">Peso (kg)</Label>
-              <Input type="number" value={form.peso || 0} onChange={e => setForm({ ...form, peso: parseFloat(e.target.value) })} className="col-span-3" />
+              <Input
+                type="number"
+                value={form.peso || ""}
+                onChange={(e) =>
+                  setForm({ ...form, peso: parseFloat(e.target.value) })
+                }
+                className="col-span-3"
+              />
             </div>
+
             <div className="items-center gap-2 grid grid-cols-4">
               <Label className="text-right">Estado Salud</Label>
-              <Select value={form.estado_salud || "saludable"} onValueChange={value => setForm({ ...form, estado_salud: value })}>
-                <SelectTrigger><SelectValue placeholder="Selecciona estado" /></SelectTrigger>
+              <Select
+                value={form.estado_salud || ""}
+                onValueChange={(value) => setForm({ ...form, estado_salud: value })}
+              >
+                <SelectTrigger className="col-span-3 w-full">
+                  <SelectValue placeholder="Selecciona estado" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="saludable">Saludable</SelectItem>
                   <SelectItem value="tratamiento">En tratamiento</SelectItem>
@@ -383,10 +423,18 @@ export default function AnimalesTable() {
                 </SelectContent>
               </Select>
             </div>
+
+
+
             <div className="items-center gap-2 grid grid-cols-4">
               <Label className="text-right">Ubicación</Label>
-              <Select value={form.ubicacion || "potrero 1"} onValueChange={value => setForm({ ...form, ubicacion: value })} >
-                <SelectTrigger><SelectValue placeholder="Seleccione ubicación" /></SelectTrigger>
+              <Select
+                value={form.ubicacion || ""}
+                onValueChange={(value) => setForm({ ...form, ubicacion: value })}
+              >
+                <SelectTrigger className="col-span-3 w-full">
+                  <SelectValue placeholder="Seleccione ubicación" />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="potrero 1">Potrero 1</SelectItem>
                   <SelectItem value="potrero 2">Potrero 2</SelectItem>
@@ -395,9 +443,32 @@ export default function AnimalesTable() {
                 </SelectContent>
               </Select>
             </div>
+            {/* Fecha último chequeo */}
+            <div className="items-center gap-2 grid grid-cols-4">
+              <Label className="text-right">Último Chequeo</Label>
+              <Input
+                type="date"
+                value={
+                  form.fecha_ultimo_chequeo
+                    ? new Date(form.fecha_ultimo_chequeo).toISOString().split("T")[0]
+                    : ""
+                }
+                onChange={(e) =>
+                  setForm({ ...form, fecha_ultimo_chequeo: e.target.value })
+                }
+                className="col-span-3"
+              />
+            </div>
+
             <div className="items-center gap-2 grid grid-cols-4">
               <Label className="text-right">Observación</Label>
-              <Input value={form.observacion || ""} onChange={e => setForm({ ...form, observacion: e.target.value })} className="col-span-3" />
+              <Input
+                value={form.observacion || ""}
+                onChange={(e) =>
+                  setForm({ ...form, observacion: e.target.value })
+                }
+                className="col-span-3"
+              />
             </div>
           </div>
           <DialogFooter>
@@ -405,6 +476,7 @@ export default function AnimalesTable() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
 
       {/* Modal Eliminar */}
       <Dialog open={openDelete} onOpenChange={setOpenDelete}>

@@ -44,7 +44,7 @@ export default function Ganado() {
       console.error("❌ Error al registrar:", error.message)
       toast.error("Hubo un error al guardar el animal")
     } else {
-      toast.success("✅ Animal registrado con éxito")
+      toast.success(" Animal registrado con éxito")
       form.reset()
       setFechaNacimiento(undefined)
       setFechaUltimoChequeo(undefined)
@@ -199,7 +199,7 @@ export default function Ganado() {
             {/* Botón */}
             <div className="text-center">
               <Button type="submit" className="bg-green-600 hover:bg-green-700 w-full md:w-auto">
-                Registrar Animal
+                + Registrar Animal
               </Button>
             </div>
           </form>

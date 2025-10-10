@@ -21,19 +21,82 @@ import toast, { Toaster } from "react-hot-toast"
 export default function Ganado() {
   const [fechaNacimiento, setFechaNacimiento] = React.useState<Date | undefined>()
   const [fechaUltimoChequeo, setFechaUltimoChequeo] = React.useState<Date | undefined>()
+  const [fechaMuerte, setFechaMuerte] = React.useState<Date | undefined>()
+
+  // Estados para abrir/cerrar los calendarios
+  const [openNacimiento, setOpenNacimiento] = React.useState(false)
+  const [openChequeo, setOpenChequeo] = React.useState(false)
+  const [openMuerte, setOpenMuerte] = React.useState(false)
+
+  // Código incremental
+  const [nuevoCodigo, setNuevoCodigo] = React.useState<number | null>(null)
+
+  // Al cargar, calcular el nuevo código
+  React.useEffect(() => {
+    const obtenerSiguienteCodigo = async () => {
+      const { data, error } = await supabase
+        .from("animales")
+        .select("codigo_identificacion")
+        .order("codigo_identificacion", { ascending: false })
+        .limit(1)
+
+      if (error) {
+        console.error("❌ Error al obtener código:", error.message)
+        toast.error("No se pudo obtener el código automático")
+      } else {
+        const ultimoCodigo = data?.[0]?.codigo_identificacion
+          ? Number(data[0].codigo_identificacion)
+          : 0
+        setNuevoCodigo(ultimoCodigo + 1)
+      }
+    }
+
+    obtenerSiguienteCodigo()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const form = e.target as HTMLFormElement
     const formData = new FormData(form)
+    const hoy = new Date()
+
+    if (!nuevoCodigo) {
+      toast.error("No se pudo generar el código automáticamente")
+      return
+    }
+
+    // 🧩 Validaciones lógicas
+    if (fechaNacimiento && fechaUltimoChequeo && fechaUltimoChequeo < fechaNacimiento) {
+      toast.error("❌ La fecha de último chequeo no puede ser menor a la de nacimiento.")
+      return
+    }
+    if (fechaNacimiento && fechaMuerte && fechaMuerte < fechaNacimiento) {
+      toast.error("❌ La fecha de muerte no puede ser anterior a la de nacimiento.")
+      return
+    }
+
+    // 🚫 Validaciones de fechas futuras
+    if (fechaNacimiento && fechaNacimiento > hoy) {
+      toast.error("❌ La fecha de nacimiento no puede ser posterior a hoy.")
+      return
+    }
+    if (fechaUltimoChequeo && fechaUltimoChequeo > hoy) {
+      toast.error("❌ La fecha de último chequeo no puede ser posterior a hoy.")
+      return
+    }
+    if (fechaMuerte && fechaMuerte > hoy) {
+      toast.error("❌ La fecha de muerte no puede ser posterior a hoy.")
+      return
+    }
 
     const data = {
-      codigo_identificacion: formData.get("idAnimal"),
+      codigo_identificacion: nuevoCodigo, // generado automáticamente
       raza: formData.get("raza"),
       peso: Number(formData.get("peso")),
       sexo: formData.get("sexo"),
       fecha_nacimiento: fechaNacimiento ? format(fechaNacimiento, "yyyy-MM-dd") : null,
       fecha_ultimo_chequeo: fechaUltimoChequeo ? format(fechaUltimoChequeo, "yyyy-MM-dd") : null,
+      fecha_muerte: fechaMuerte ? format(fechaMuerte, "yyyy-MM-dd") : null,
       estado_salud: formData.get("estadoSalud"),
       ubicacion: formData.get("ubicacion"),
       observacion: formData.get("observacion"),
@@ -44,10 +107,12 @@ export default function Ganado() {
       console.error("❌ Error al registrar:", error.message)
       toast.error("Hubo un error al guardar el animal")
     } else {
-      toast.success(" Animal registrado con éxito")
+      toast.success(`✅ Animal #${nuevoCodigo} registrado con éxito`)
       form.reset()
       setFechaNacimiento(undefined)
       setFechaUltimoChequeo(undefined)
+      setFechaMuerte(undefined)
+      setNuevoCodigo(nuevoCodigo + 1) // preparar el siguiente
     }
   }
 
@@ -57,13 +122,23 @@ export default function Ganado() {
       <Card className="shadow-lg mx-auto mt-5 w-full">
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-5 w-full">
-            <h2 className="mb-4 pb-2 border-b font-semibold text-gray-800 text-xl">Información Animal</h2>
+            <h2 className="mb-4 pb-2 border-b font-semibold text-gray-800 text-xl">
+              Información Animal
+            </h2>
 
             <div className="gap-4 grid md:grid-cols-2 w-full">
-              {/* ID del Animal */}
+              {/* Código de identificación automático */}
               <div>
-                <Label className="block mb-1 font-medium text-gray-700 text-sm">Codigo Identificación</Label>
-                <Input type="number" name="idAnimal" placeholder="Codigo" required />
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">
+                  Código Identificación
+                </Label>
+                <Input
+                  type="number"
+                  name="idAnimal"
+                  value={nuevoCodigo ?? ""}
+                  readOnly
+                  className="bg-gray-100 cursor-not-allowed"
+                />
               </div>
 
               {/* Raza */}
@@ -105,13 +180,12 @@ export default function Ganado() {
 
               {/* Fecha de Nacimiento */}
               <div className="flex flex-col gap-2">
-                <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Nacimiento</Label>
-                <Popover>
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">
+                  Fecha de Nacimiento
+                </Label>
+                <Popover open={openNacimiento} onOpenChange={setOpenNacimiento}>
                   <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="justify-start w-full font-normal text-left"
-                    >
+                    <Button variant="outline" className="justify-start w-full font-normal text-left">
                       <CalendarIcon className="mr-2 w-4 h-4" />
                       {fechaNacimiento ? format(fechaNacimiento, "yyyy-MM-dd") : "Selecciona fecha"}
                     </Button>
@@ -120,7 +194,11 @@ export default function Ganado() {
                     <Calendar
                       mode="single"
                       selected={fechaNacimiento}
-                      onSelect={setFechaNacimiento}
+                      onSelect={(date) => {
+                        setFechaNacimiento(date)
+                        setOpenNacimiento(false)
+                      }}
+                      disabled={(date) => date > new Date()}
                       captionLayout="dropdown"
                       fromYear={2000}
                       toYear={2030}
@@ -132,22 +210,27 @@ export default function Ganado() {
 
               {/* Fecha de Último Chequeo */}
               <div className="flex flex-col gap-2">
-                <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Último Chequeo</Label>
-                <Popover>
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">
+                  Fecha de Último Chequeo
+                </Label>
+                <Popover open={openChequeo} onOpenChange={setOpenChequeo}>
                   <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="justify-start w-full font-normal text-left"
-                    >
+                    <Button variant="outline" className="justify-start w-full font-normal text-left">
                       <CalendarIcon className="mr-2 w-4 h-4" />
-                      {fechaUltimoChequeo ? format(fechaUltimoChequeo, "yyyy-MM-dd") : "Selecciona fecha"}
+                      {fechaUltimoChequeo
+                        ? format(fechaUltimoChequeo, "yyyy-MM-dd")
+                        : "Selecciona fecha"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="p-0">
                     <Calendar
                       mode="single"
                       selected={fechaUltimoChequeo}
-                      onSelect={setFechaUltimoChequeo}
+                      onSelect={(date) => {
+                        setFechaUltimoChequeo(date)
+                        setOpenChequeo(false)
+                      }}
+                      disabled={(date) => date > new Date()}
                       captionLayout="dropdown"
                       fromYear={2000}
                       toYear={2030}
@@ -155,6 +238,44 @@ export default function Ganado() {
                     />
                   </PopoverContent>
                 </Popover>
+              </div>
+
+              {/* Fecha de Muerte */}
+              <div className="flex flex-col gap-2 relative">
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Muerte</Label>
+                <Popover open={openMuerte} onOpenChange={setOpenMuerte}>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="justify-start w-full font-normal text-left">
+                      <CalendarIcon className="mr-2 w-4 h-4" />
+                      {fechaMuerte ? format(fechaMuerte, "yyyy-MM-dd") : "Selecciona fecha"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0">
+                    <Calendar
+                      mode="single"
+                      selected={fechaMuerte}
+                      onSelect={(date) => {
+                        setFechaMuerte(date)
+                        setOpenMuerte(false)
+                      }}
+                      disabled={(date) => date > new Date()}
+                      captionLayout="dropdown"
+                      fromYear={2000}
+                      toYear={2030}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                {fechaMuerte && (
+                  <button
+                    type="button"
+                    onClick={() => setFechaMuerte(undefined)}
+                    className="absolute right-3 top-[38px] text-gray-500 hover:text-red-500 transition"
+                    title="Borrar fecha"
+                  >
+                    ×
+                  </button>
+                )}
               </div>
 
               {/* Estado de Salud */}

@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/table";
 import { Edit, Eye, Trash2 } from "lucide-react";
 
-// Definición del tipo Animal
+// ====== Tipado ======
 type Animal = {
   id: number;
   codigo_identificacion: string;
@@ -49,41 +49,42 @@ type Animal = {
 
 export default function AnimalesTable() {
   // ===== Estados principales =====
-  const [animales, setAnimales] = useState<Animal[]>([]); // Todos los animales cargados
-  const [animalesFiltrados, setAnimalesFiltrados] = useState<Animal[]>([]); // Animales después de aplicar filtros
-  const [loading, setLoading] = useState(true); // Estado de carga
+  const [animales, setAnimales] = useState<Animal[]>([]);
+  const [animalesFiltrados, setAnimalesFiltrados] = useState<Animal[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // ===== Modales y selección =====
-  const [openView, setOpenView] = useState(false); // Modal de observaciones
-  const [openEdit, setOpenEdit] = useState(false); // Modal de edición
-  const [openDelete, setOpenDelete] = useState(false); // Modal de eliminación
-  const [animalSeleccionado, setAnimalSeleccionado] = useState<Animal | null>(null); // Animal actualmente seleccionado
+  // ===== Modales =====
+  const [openView, setOpenView] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [animalSeleccionado, setAnimalSeleccionado] = useState<Animal | null>(null);
 
-  // ===== Formulario de edición =====
-  const [form, setForm] = useState<Partial<Animal>>({}); // Estado parcial del formulario para editar
+  // ===== Formulario edición =====
+  const [form, setForm] = useState<Partial<Animal>>({});
 
   // ===== Filtros =====
-  const [buscarCodigo, setBuscarCodigo] = useState(""); // Filtro por código de identificación
-  const [filtroSexo, setFiltroSexo] = useState("todos"); // Filtro por sexo
-  const [filtroRaza, setFiltroRaza] = useState("todos"); // Filtro por raza
-  const [filtroUbicacion, setFiltroUbicacion] = useState("todos"); // Filtro por ubicación
-  const [filtroEstadoSalud, setFiltroEstadoSalud] = useState("todos"); // Filtro por estado de salud
-  const [ordenPeso, setOrdenPeso] = useState<"ninguno" | "asc" | "desc">("ninguno"); // Orden de peso
+  const [buscarCodigo, setBuscarCodigo] = useState("");
+  const [filtroSexo, setFiltroSexo] = useState("todos");
+  const [filtroRaza, setFiltroRaza] = useState("todos");
+  const [filtroPeso, setFiltroPeso] = useState("todos");
+  const [filtroUbicacion, setFiltroUbicacion] = useState("todos");
+  const [filtroEstadoSalud, setFiltroEstadoSalud] = useState("todos");
+  const [ordenPeso, setOrdenPeso] = useState<"ninguno" | "asc" | "desc">("ninguno");
 
   // ===== Paginación =====
-  const [currentPage, setCurrentPage] = useState(1); // Página actual
-  const itemsPerPage = 9; // Número de items por página
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
 
-  // ===== Cargar animales desde Supabase =====
+  // ===== Cargar animales =====
   useEffect(() => {
     const fetchAnimales = async () => {
       const { data, error } = await supabase
         .from("animales")
         .select("*")
-        .order("codigo_identificacion", { ascending: true }); // Orden por código ascendente
-      if (error) {
-        console.error("Error cargando animales:", error.message);
-      } else {
+        .order("codigo_identificacion", { ascending: true });
+
+      if (error) console.error("Error cargando animales:", error.message);
+      else {
         setAnimales(data as Animal[]);
         setAnimalesFiltrados(data as Animal[]);
       }
@@ -92,39 +93,52 @@ export default function AnimalesTable() {
     fetchAnimales();
   }, []);
 
-  // ===== Aplicar filtros y orden =====
+  // ===== Aplicar filtros =====
   useEffect(() => {
     let filtrados = [...animales];
 
-    // Filtrar por código
     if (buscarCodigo)
-      filtrados = filtrados.filter(a =>
+      filtrados = filtrados.filter((a) =>
         a.codigo_identificacion.toString().includes(buscarCodigo)
       );
 
-    // Filtrar por sexo
     if (filtroSexo !== "todos")
-      filtrados = filtrados.filter(a => a.sexo === filtroSexo);
+      filtrados = filtrados.filter((a) => a.sexo === filtroSexo);
 
-    // Filtrar por raza
     if (filtroRaza !== "todos")
-      filtrados = filtrados.filter(a => a.raza === filtroRaza);
+      filtrados = filtrados.filter((a) => a.raza === filtroRaza);
 
-    // Filtrar por ubicación
     if (filtroUbicacion !== "todos")
-      filtrados = filtrados.filter(a => a.ubicacion === filtroUbicacion);
+      filtrados = filtrados.filter((a) => a.ubicacion === filtroUbicacion);
 
-    // Filtrar por estado de salud
     if (filtroEstadoSalud !== "todos")
-      filtrados = filtrados.filter(a => a.estado_salud === filtroEstadoSalud);
+      filtrados = filtrados.filter((a) => a.estado_salud === filtroEstadoSalud);
 
-    // Ordenar por peso
+    // 🔹 Filtro de peso (por rangos)
+    if (filtroPeso !== "todos") {
+      filtrados = filtrados.filter((a) => {
+        if (filtroPeso === "ligero") return a.peso < 200;
+        if (filtroPeso === "medio") return a.peso >= 200 && a.peso <= 400;
+        if (filtroPeso === "pesado") return a.peso > 400;
+        return true;
+      });
+    }
+
     if (ordenPeso === "asc") filtrados.sort((a, b) => a.peso - b.peso);
     else if (ordenPeso === "desc") filtrados.sort((a, b) => b.peso - a.peso);
 
     setAnimalesFiltrados(filtrados);
-    setCurrentPage(1); // Reiniciar a la primera página
-  }, [buscarCodigo, filtroSexo, filtroRaza, ordenPeso, filtroUbicacion, filtroEstadoSalud, animales]);
+    setCurrentPage(1);
+  }, [
+    buscarCodigo,
+    filtroSexo,
+    filtroRaza,
+    filtroPeso,
+    filtroUbicacion,
+    filtroEstadoSalud,
+    ordenPeso,
+    animales,
+  ]);
 
   // ===== Editar animal =====
   const handleEdit = (animal: Animal) => {
@@ -150,23 +164,30 @@ export default function AnimalesTable() {
     if (error) toast.error("❌ No se pudo actualizar el animal");
     else {
       const updated = { ...animalSeleccionado, ...form } as Animal;
-      // Actualizar estados locales
-      setAnimales(prev => prev.map(a => (a.id === animalSeleccionado.id ? updated : a)));
-      setAnimalesFiltrados(prev => prev.map(a => (a.id === animalSeleccionado.id ? updated : a)));
+      setAnimales((prev) =>
+        prev.map((a) => (a.id === animalSeleccionado.id ? updated : a))
+      );
+      setAnimalesFiltrados((prev) =>
+        prev.map((a) => (a.id === animalSeleccionado.id ? updated : a))
+      );
       setOpenEdit(false);
       toast.success("✅ Animal actualizado correctamente");
     }
   };
 
-  // ===== Borrar animal =====
+  // ===== Eliminar animal =====
   const handleDelete = async () => {
     if (!animalSeleccionado) return;
-    const { error } = await supabase.from("animales").delete().eq("id", animalSeleccionado.id);
+    const { error } = await supabase
+      .from("animales")
+      .delete()
+      .eq("id", animalSeleccionado.id);
     if (error) toast.error("❌ No se pudo eliminar el animal");
     else {
-      // Actualizar estados locales
-      setAnimales(prev => prev.filter(a => a.id !== animalSeleccionado.id));
-      setAnimalesFiltrados(prev => prev.filter(a => a.id !== animalSeleccionado.id));
+      setAnimales((prev) => prev.filter((a) => a.id !== animalSeleccionado.id));
+      setAnimalesFiltrados((prev) =>
+        prev.filter((a) => a.id !== animalSeleccionado.id)
+      );
       setOpenDelete(false);
       toast.success("🗑️ Animal eliminado correctamente");
     }
@@ -183,8 +204,7 @@ export default function AnimalesTable() {
   return (
     <div className="mt-5">
       {/* ================= FILTROS ================= */}
-      <div className="flex md:flex-row flex-col items-center gap-2 mb-4">
-        {/* Filtro por código */}
+      <div className="flex flex-col md:flex-row items-center gap-4 mb-5">
         <Input
           placeholder="Buscar por Código de identificación"
           value={buscarCodigo}
@@ -192,12 +212,16 @@ export default function AnimalesTable() {
           className="md:w-1/4"
         />
 
-        <div className="flex flex-row items-center gap-4">
-          <Label>Filtrar Sexo | Raza | Peso | Estado Salud | Ubicacion </Label>
-
+        <div className="flex flex-wrap gap-3 justify-center md:justify-start">
           {/* Filtro por sexo */}
           <Select value={filtroSexo} onValueChange={setFiltroSexo}>
-            <SelectTrigger><SelectValue placeholder="Sexo" /></SelectTrigger>
+            <SelectTrigger>
+              <span>
+                {filtroSexo !== "todos"
+                  ? `Sexo: ${filtroSexo.charAt(0).toUpperCase() + filtroSexo.slice(1)}`
+                  : "Sexo"}
+              </span>
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todos</SelectItem>
               <SelectItem value="macho">Macho</SelectItem>
@@ -207,9 +231,15 @@ export default function AnimalesTable() {
 
           {/* Filtro por raza */}
           <Select value={filtroRaza} onValueChange={setFiltroRaza}>
-            <SelectTrigger><SelectValue placeholder="Raza" /></SelectTrigger>
+            <SelectTrigger>
+              <span>
+                {filtroRaza !== "todos"
+                  ? `Raza: ${filtroRaza.charAt(0).toUpperCase() + filtroRaza.slice(1)}`
+                  : "Raza"}
+              </span>
+            </SelectTrigger>
             <SelectContent>
-              <SelectItem value="todos">Todos</SelectItem>
+              <SelectItem value="todos">Todas</SelectItem>
               <SelectItem value="brahman">Brahman</SelectItem>
               <SelectItem value="holstein">Holstein</SelectItem>
               <SelectItem value="angus">Angus</SelectItem>
@@ -218,32 +248,49 @@ export default function AnimalesTable() {
             </SelectContent>
           </Select>
 
-          {/* Orden por peso */}
-          <Select value={ordenPeso} onValueChange={value => setOrdenPeso(value as "ninguno" | "asc" | "desc")}>
-            <SelectTrigger><SelectValue placeholder="Ordenar peso" /></SelectTrigger>
+          {/* Filtro por peso */}
+          <Select value={filtroPeso} onValueChange={setFiltroPeso}>
+            <SelectTrigger>
+              <span>
+                {filtroPeso !== "todos" ? `Peso: ${filtroPeso}` : "Peso"}
+              </span>
+            </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ninguno">Sin ordenar</SelectItem>
-              <SelectItem value="asc">Menor a mayor</SelectItem>
-              <SelectItem value="desc">Mayor a menor</SelectItem>
+              <SelectItem value="todos">Todos</SelectItem>
+              <SelectItem value="ligero">Ligero (&lt; 200 kg)</SelectItem>
+              <SelectItem value="medio">Medio (200–400 kg)</SelectItem>
+              <SelectItem value="pesado">Pesado (&gt; 400 kg)</SelectItem>
             </SelectContent>
           </Select>
 
           {/* Filtro por estado de salud */}
           <Select value={filtroEstadoSalud} onValueChange={setFiltroEstadoSalud}>
-            <SelectTrigger><SelectValue placeholder="Estado salud" /></SelectTrigger>
+            <SelectTrigger>
+              <span>
+                {filtroEstadoSalud !== "todos"
+                  ? `Salud: ${filtroEstadoSalud.charAt(0).toUpperCase() + filtroEstadoSalud.slice(1)}`
+                  : "Salud"}
+              </span>
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todos</SelectItem>
               <SelectItem value="saludable">Saludable</SelectItem>
-              <SelectItem value="tratamiento">En tratamiento</SelectItem>
+              <SelectItem value="tratamiento">En Tratamiento</SelectItem>
               <SelectItem value="enfermo">Enfermo</SelectItem>
             </SelectContent>
           </Select>
 
           {/* Filtro por ubicación */}
           <Select value={filtroUbicacion} onValueChange={setFiltroUbicacion}>
-            <SelectTrigger><SelectValue placeholder="Ubicación" /></SelectTrigger>
+            <SelectTrigger>
+              <span>
+                {filtroUbicacion !== "todos"
+                  ? `Ubicación: ${filtroUbicacion.charAt(0).toUpperCase() + filtroUbicacion.slice(1)}`
+                  : "Ubicación"}
+              </span>
+            </SelectTrigger>
             <SelectContent>
-              <SelectItem value="todos">Todos</SelectItem>
+              <SelectItem value="todos">Todas</SelectItem>
               <SelectItem value="potrero 1">Potrero 1</SelectItem>
               <SelectItem value="potrero 2">Potrero 2</SelectItem>
               <SelectItem value="potrero 3">Potrero 3</SelectItem>
@@ -283,7 +330,6 @@ export default function AnimalesTable() {
                 <TableCell>{animal.estado_salud}</TableCell>
                 <TableCell>{animal.ubicacion}</TableCell>
                 <TableCell className="flex justify-center gap-2">
-                  {/* Botones de acciones */}
                   <Button size="icon" variant="secondary" onClick={() => { setAnimalSeleccionado(animal); setOpenView(true); }}>
                     <Eye className="w-4 h-4" />
                   </Button>
@@ -323,6 +369,7 @@ export default function AnimalesTable() {
         </div>
       )}
 
+     
       {/* ================= MODALES ================= */}
 
       {/* Modal Observaciones */}

@@ -42,6 +42,7 @@ type Animal = {
   sexo: string;
   fecha_nacimiento: string | null;
   fecha_ultimo_chequeo: string | null;
+  fecha_muerte: string | null;
   estado_salud: string;
   ubicacion: string;
   observacion: string | null;
@@ -370,159 +371,296 @@ export default function AnimalesTable() {
       )}
 
      
-      {/* ================= MODALES ================= */}
+      {/* ================= MODAL observacion ================= */}
 
-      {/* Modal Observaciones */}
+     
+{/* Modal Detalles del Animal */}
       <Dialog open={openView} onOpenChange={setOpenView}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Detalles del Animal</DialogTitle>
+            <DialogTitle className="text-lg font-semibold">
+              Detalles del Animal 🐄
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 mt-2 capitalize">
-            <p>
-              <strong>Último Chequeo:</strong>{" "}
-              {animalSeleccionado?.fecha_ultimo_chequeo
-                ? new Date(animalSeleccionado.fecha_ultimo_chequeo).toLocaleDateString()
-                : "No registrado"}
-            </p>
-            <p>
-              <strong>Estado de Salud:</strong>{" "}
-              {animalSeleccionado?.estado_salud || "No registrado"}
-            </p>
-            <p>
-              <strong>Observación:</strong>{" "}
-              {animalSeleccionado?.observacion || "No hay observaciones registradas para este animal."}
-            </p>
-          </div>
-        </DialogContent>
-      </Dialog>
 
+          {animalSeleccionado && (
+            <div className="grid gap-3 mt-3 text-sm sm:text-base capitalize">
+              <p><strong>Código:</strong> {animalSeleccionado.codigo_identificacion}</p>
+              <p><strong>Raza:</strong> {animalSeleccionado.raza}</p>
+              <p><strong>Peso:</strong> {animalSeleccionado.peso} kg</p>
+              <p><strong>Sexo:</strong> {animalSeleccionado.sexo}</p>
 
+              <hr className="my-1 border-gray-300" />
 
-      {/* Modal Editar */}
-      <Dialog open={openEdit} onOpenChange={setOpenEdit}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Editar Animal</DialogTitle>
-          </DialogHeader>
-          <div className="gap-4 grid py-4">
-            {/* Campos del formulario de edición */}
-            <div className="items-center gap-2 grid grid-cols-4">
-              <Label className="text-right">Raza</Label>
-              <Select
-                value={form.raza || ""}
-                onValueChange={(value) => setForm({ ...form, raza: value })}
-              >
-                <SelectTrigger className="col-span-3 w-full">
-                  <SelectValue placeholder="Selecciona raza" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="brahman">Brahman</SelectItem>
-                  <SelectItem value="holstein">Holstein</SelectItem>
-                  <SelectItem value="angus">Angus</SelectItem>
-                  <SelectItem value="simmental">Simmental</SelectItem>
-                  <SelectItem value="gyr">Gyr</SelectItem>
-                </SelectContent>
-              </Select>
+              <p>
+                <strong>Fecha de nacimiento:</strong>{" "}
+                {animalSeleccionado.fecha_nacimiento
+                  ? new Date(animalSeleccionado.fecha_nacimiento).toLocaleDateString()
+                  : "No registrada"}
+              </p>
+              <p>
+                <strong>Último chequeo:</strong>{" "}
+                {animalSeleccionado.fecha_ultimo_chequeo
+                  ? new Date(animalSeleccionado.fecha_ultimo_chequeo).toLocaleDateString()
+                  : "No registrado"}
+              </p>
+              <p>
+                <strong>Fecha de muerte:</strong>{" "}
+                {animalSeleccionado.fecha_muerte
+                  ? new Date(animalSeleccionado.fecha_muerte).toLocaleDateString()
+                  : "—"}
+              </p>
+
+              <hr className="my-1 border-gray-300" />
+
+              <p><strong>Estado de salud:</strong> {animalSeleccionado.estado_salud}</p>
+              <p><strong>Ubicación:</strong> {animalSeleccionado.ubicacion}</p>
+
+              <p>
+                <strong>Observación:</strong>{" "}
+                {animalSeleccionado.observacion
+                  ? animalSeleccionado.observacion
+                  : "No hay observaciones registradas."}
+              </p>
             </div>
+          )}
 
-            <div className="items-center gap-2 grid grid-cols-4">
-              <Label className="text-right">Sexo</Label>
-              <Select
-                value={form.sexo || ""}
-                onValueChange={(value) => setForm({ ...form, sexo: value })}
-              >
-                <SelectTrigger className="col-span-3 w-full">
-                  <SelectValue placeholder="Selecciona sexo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="macho">Macho</SelectItem>
-                  <SelectItem value="hembra">Hembra</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="items-center gap-2 grid grid-cols-4">
-              <Label className="text-right">Peso (kg)</Label>
-              <Input
-                type="number"
-                value={form.peso || ""}
-                onChange={(e) =>
-                  setForm({ ...form, peso: parseFloat(e.target.value) })
-                }
-                className="col-span-3"
-              />
-            </div>
-
-            <div className="items-center gap-2 grid grid-cols-4">
-              <Label className="text-right">Estado Salud</Label>
-              <Select
-                value={form.estado_salud || ""}
-                onValueChange={(value) => setForm({ ...form, estado_salud: value })}
-              >
-                <SelectTrigger className="col-span-3 w-full">
-                  <SelectValue placeholder="Selecciona estado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="saludable">Saludable</SelectItem>
-                  <SelectItem value="tratamiento">En tratamiento</SelectItem>
-                  <SelectItem value="enfermo">Enfermo</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-
-
-            <div className="items-center gap-2 grid grid-cols-4">
-              <Label className="text-right">Ubicación</Label>
-              <Select
-                value={form.ubicacion || ""}
-                onValueChange={(value) => setForm({ ...form, ubicacion: value })}
-              >
-                <SelectTrigger className="col-span-3 w-full">
-                  <SelectValue placeholder="Seleccione ubicación" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="potrero 1">Potrero 1</SelectItem>
-                  <SelectItem value="potrero 2">Potrero 2</SelectItem>
-                  <SelectItem value="potrero 3">Potrero 3</SelectItem>
-                  <SelectItem value="potrero 4">Potrero 4</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            {/* Fecha último chequeo */}
-            <div className="items-center gap-2 grid grid-cols-4">
-              <Label className="text-right">Último Chequeo</Label>
-              <Input
-                type="date"
-                value={
-                  form.fecha_ultimo_chequeo
-                    ? new Date(form.fecha_ultimo_chequeo).toISOString().split("T")[0]
-                    : ""
-                }
-                onChange={(e) =>
-                  setForm({ ...form, fecha_ultimo_chequeo: e.target.value })
-                }
-                className="col-span-3"
-              />
-            </div>
-
-            <div className="items-center gap-2 grid grid-cols-4">
-              <Label className="text-right">Observación</Label>
-              <Input
-                value={form.observacion || ""}
-                onChange={(e) =>
-                  setForm({ ...form, observacion: e.target.value })
-                }
-                className="col-span-3"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={handleSave}>Guardar</Button>
+          <DialogFooter className="mt-3">
+            <Button variant="outline" onClick={() => setOpenView(false)}>
+              Cerrar
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+
+
+
+     {/* Modal Editar Animal */}
+      <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Animal 🐄</DialogTitle>
+          </DialogHeader>
+
+          {form && (
+            <div className="gap-4 grid py-4 text-sm sm:text-base">
+              {/* Código */}
+              <div className="items-center gap-2 grid grid-cols-4">
+                <Label className="text-right">Código</Label>
+                <Input
+                  disabled
+                  value={form.codigo_identificacion || ""}
+                  className="col-span-3 bg-gray-100"
+                />
+              </div>
+
+              {/* Raza */}
+              <div className="items-center gap-2 grid grid-cols-4">
+                <Label className="text-right">Raza</Label>
+                <Select
+                  value={form.raza || ""}
+                  onValueChange={(value) => setForm({ ...form, raza: value })}
+                >
+                  <SelectTrigger className="col-span-3 w-full">
+                    <SelectValue placeholder="Selecciona raza" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="brahman">Brahman</SelectItem>
+                    <SelectItem value="holstein">Holstein</SelectItem>
+                    <SelectItem value="angus">Angus</SelectItem>
+                    <SelectItem value="simmental">Simmental</SelectItem>
+                    <SelectItem value="gyr">Gyr</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Sexo */}
+              <div className="items-center gap-2 grid grid-cols-4">
+                <Label className="text-right">Sexo</Label>
+                <Select
+                  value={form.sexo || ""}
+                  onValueChange={(value) => setForm({ ...form, sexo: value })}
+                >
+                  <SelectTrigger className="col-span-3 w-full">
+                    <SelectValue placeholder="Selecciona sexo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="macho">Macho</SelectItem>
+                    <SelectItem value="hembra">Hembra</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Peso */}
+              <div className="items-center gap-2 grid grid-cols-4">
+                <Label className="text-right">Peso (kg)</Label>
+                <Input
+                  type="number"
+                  value={form.peso || ""}
+                  onChange={(e) => setForm({ ...form, peso: parseFloat(e.target.value) })}
+                  className="col-span-3"
+                />
+              </div>
+
+              {/* Fecha de nacimiento */}
+              <div className="items-center gap-2 grid grid-cols-4">
+                <Label className="text-right">Fecha de Nacimiento</Label>
+                <Input
+                  type="date"
+                  value={
+                    form.fecha_nacimiento
+                      ? new Date(form.fecha_nacimiento).toISOString().split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) => setForm({ ...form, fecha_nacimiento: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+
+              {/* Fecha de último chequeo */}
+              <div className="items-center gap-2 grid grid-cols-4">
+                <Label className="text-right">Último Chequeo</Label>
+                <Input
+                  type="date"
+                  value={
+                    form.fecha_ultimo_chequeo
+                      ? new Date(form.fecha_ultimo_chequeo).toISOString().split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) => setForm({ ...form, fecha_ultimo_chequeo: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+
+              {/* Checkbox de fallecido */}
+              <div className="items-center gap-2 grid grid-cols-4">
+                <Label className="text-right">¿Fallecido?</Label>
+                <input
+                  type="checkbox"
+                  checked={!!form.fecha_muerte}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      fecha_muerte: e.target.checked ? new Date().toISOString().split("T")[0] : null,
+                    })
+                  }
+                  className="col-span-3 w-5 h-5 accent-red-600 cursor-pointer"
+                />
+              </div>
+
+              {/* Fecha de muerte (solo visible si existe) */}
+              {form.fecha_muerte && (
+                <div className="items-center gap-2 grid grid-cols-4">
+                  <Label className="text-right">Fecha de Muerte</Label>
+                  <Input
+                    type="date"
+                    value={
+                      form.fecha_muerte
+                        ? new Date(form.fecha_muerte).toISOString().split("T")[0]
+                        : ""
+                    }
+                    onChange={(e) => setForm({ ...form, fecha_muerte: e.target.value })}
+                    className="col-span-3"
+                  />
+                </div>
+              )}
+
+              {/* Estado de salud */}
+              <div className="items-center gap-2 grid grid-cols-4">
+                <Label className="text-right">Estado Salud</Label>
+                <Select
+                  value={form.estado_salud || ""}
+                  onValueChange={(value) => setForm({ ...form, estado_salud: value })}
+                >
+                  <SelectTrigger className="col-span-3 w-full">
+                    <SelectValue placeholder="Selecciona estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="saludable">Saludable</SelectItem>
+                    <SelectItem value="tratamiento">En tratamiento</SelectItem>
+                    <SelectItem value="enfermo">Enfermo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Ubicación */}
+              <div className="items-center gap-2 grid grid-cols-4">
+                <Label className="text-right">Ubicación</Label>
+                <Select
+                  value={form.ubicacion || ""}
+                  onValueChange={(value) => setForm({ ...form, ubicacion: value })}
+                >
+                  <SelectTrigger className="col-span-3 w-full">
+                    <SelectValue placeholder="Seleccione ubicación" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="potrero 1">Potrero 1</SelectItem>
+                    <SelectItem value="potrero 2">Potrero 2</SelectItem>
+                    <SelectItem value="potrero 3">Potrero 3</SelectItem>
+                    <SelectItem value="potrero 4">Potrero 4</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Observación */}
+              <div className="items-center gap-2 grid grid-cols-4">
+                <Label className="text-right">Observación</Label>
+                <Input
+                  value={form.observacion || ""}
+                  onChange={(e) => setForm({ ...form, observacion: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpenEdit(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={async () => {
+                if (!animalSeleccionado) return;
+
+                const { error } = await supabase
+                  .from("animales")
+                  .update({
+                    raza: form.raza,
+                    peso: form.peso,
+                    sexo: form.sexo,
+                    fecha_nacimiento: form.fecha_nacimiento,
+                    fecha_ultimo_chequeo: form.fecha_ultimo_chequeo,
+                    fecha_muerte: form.fecha_muerte || null,
+                    estado_salud: form.estado_salud,
+                    ubicacion: form.ubicacion,
+                    observacion: form.observacion,
+                  })
+                  .eq("id", animalSeleccionado.id);
+
+                if (error) toast.error("❌ No se pudo actualizar el animal");
+                else {
+                  toast.success("✅ Animal actualizado correctamente");
+                  setOpenEdit(false);
+                  setAnimales((prev) =>
+                    prev.map((a) =>
+                      a.id === animalSeleccionado.id ? { ...a, ...form } : a
+                    )
+                  );
+                  setAnimalesFiltrados((prev) =>
+                    prev.map((a) =>
+                      a.id === animalSeleccionado.id ? { ...a, ...form } : a
+                    )
+                  );
+                }
+              }}
+            >
+              Guardar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
 
 
       {/* Modal Eliminar */}

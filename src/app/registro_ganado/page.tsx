@@ -290,6 +290,7 @@ export default function Ganado() {
                     <SelectItem value="tratamiento">En Tratamiento</SelectItem>
                     <SelectItem value="observacion">En Observación</SelectItem>
                     <SelectItem value="enfermo">Enfermo</SelectItem>
+                    <SelectItem value="muerto">Muerto</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

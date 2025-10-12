@@ -240,7 +240,7 @@ export default function AnimalesTable() {
               </span>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="todos">Todas</SelectItem>
+              <SelectItem value="todos">Todos</SelectItem>
               <SelectItem value="brahman">Brahman</SelectItem>
               <SelectItem value="holstein">Holstein</SelectItem>
               <SelectItem value="angus">Angus</SelectItem>

@@ -28,7 +28,7 @@ export default function Ganado() {
     const formData = new FormData(form)
 
     const data = {
-      codigo_identificacion: formData.get("idAnimal"),
+      codigo_identificacion: formData.get("codigoIdentificacion"),
       raza: formData.get("raza"),
       peso: Number(formData.get("peso")),
       sexo: formData.get("sexo"),
@@ -54,7 +54,7 @@ export default function Ganado() {
   return (
     <>
       <Toaster position="top-right" />
-      <Card className="shadow-lg mx-auto mt-5 w-full">
+      <Card className="mx-auto mt-5 w-full">
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-5 w-full">
             <h2 className="mb-4 pb-2 border-b font-semibold text-gray-800 text-xl">Información Animal</h2>
@@ -63,7 +63,7 @@ export default function Ganado() {
               {/* ID del Animal */}
               <div>
                 <Label className="block mb-1 font-medium text-gray-700 text-sm">Codigo Identificación</Label>
-                <Input type="number" name="idAnimal" placeholder="Codigo" required />
+                <Input type="number" name="codigoIdentificacion" placeholder="Codigo" required />
               </div>
 
               {/* Raza */}
@@ -105,7 +105,7 @@ export default function Ganado() {
 
               {/* Fecha de Nacimiento */}
               <div className="flex flex-col gap-2">
-                <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Nacimiento</Label>
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Nacimiento <span className="text-gray-400 text-sm">(Opcional)</span> </Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -132,7 +132,7 @@ export default function Ganado() {
 
               {/* Fecha de Último Chequeo */}
               <div className="flex flex-col gap-2">
-                <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Último Chequeo</Label>
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Último Chequeo <span className="text-gray-400 text-sm">(Opcional)</span></Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -191,10 +191,18 @@ export default function Ganado() {
             </div>
 
             {/* Observación */}
-            <div>
-              <Label className="block mb-1 font-medium text-gray-700 text-sm">Observación</Label>
-              <Textarea name="observacion" placeholder="Notas Adicionales" />
+            <div className="col-span-2">
+              <Label className="block mb-1 font-medium text-gray-700 text-sm">
+                Observación <span className="text-gray-400 text-sm">(Opcional)</span>
+              </Label>
+              <Textarea
+                name="observacion"
+                placeholder="Notas Adicionales"
+                className="block w-full max-w-full min-h-[80px] max-h-[150px] overflow-x-hidden overflow-y-auto break-all text-wrap resize-none"
+                style={{ wordBreak: "break-all", whiteSpace: "pre-wrap" }}
+              />
             </div>
+
 
             {/* Botón */}
             <div className="text-center">

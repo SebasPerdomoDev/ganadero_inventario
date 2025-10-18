@@ -1,176 +1,136 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/lib/supabase";
+import { useEffect, useState } from "react";
+
+import { cowHead } from "@lucide/lab";
+import { Baby, DollarSign, HeartPulse, Icon, ShoppingCart, Skull } from "lucide-react";
 
 export default function Dashboard() {
-  const [inventory, setInventory] = useState<any[]>([]);
-  const [totalWeight, setTotalWeight] = useState(0);
-  const [lowStock, setLowStock] = useState<any[]>([]);
-  const [mostUsedFood, setMostUsedFood] = useState<string>("Cargando...");
-  const [mostUsedFoodAmount, setMostUsedFoodAmount] = useState<number>(0);
-  const [todayFeedings, setTodayFeedings] = useState(0);
+  const [totalAnimales, setTotalAnimales] = useState<number>(0);
+  const [animalesVivos, setAnimalesVivos] = useState<number>(0);
+  const [muertesMes, setMuertesMes] = useState<number>(0);
+  const [nacimientosMes, setNacimientosMes] = useState<number>(0);
+  const [ventasRealizadas, setVentasRealizadas] = useState<number>(0);
+  const [totalVentas, setTotalVentas] = useState<number>(0);
 
   useEffect(() => {
-    fetchInventory();
-    fetchMostUsedFood();
-    fetchTodayFeedings();
+    fetchDatos();
   }, []);
 
-  const fetchInventory = async () => {
-    const { data, error } = await supabase.from("inventario").select("*");
+  const fetchDatos = async () => {
+    try {
+      const { count: total } = await supabase
+        .from("animales")
+        .select("*", { count: "exact", head: true });
+      setTotalAnimales(total || 0);
 
-    if (error) {
-      console.error(error);
-      return;
-    }
+      const mesActual = new Date().toISOString().slice(0, 7);
 
-    setInventory(data);
-    const total = data.reduce((acc, item) => acc + item.cantidad, 0);
-    setTotalWeight(total);
+      const { count: muertes } = await supabase
+        .from("muertes")
+        .select("*", { count: "exact", head: true })
+        .gte("fecha_muerte", `${mesActual}-01`)
+        .lte("fecha_muerte", `${mesActual}-31`);
+      setMuertesMes(muertes || 0);
 
-    const low = data.filter((item) => item.cantidad < 50);
-    setLowStock(low);
-  };
+      const { count: nacimientos } = await supabase
+        .from("nacimientos")
+        .select("*", { count: "exact", head: true })
+        .gte("fecha_nacimiento", `${mesActual}-01`)
+        .lte("fecha_nacimiento", `${mesActual}-31`);
+      setNacimientosMes(nacimientos || 0);
 
-  type Alimentacion = {
-    alimento_id: number;
-    cantidad: number;
-    inventario: { nombre: string }[] | { nombre: string } | null;
-  };
+      const { data: ventasData, count: ventasCount } = await supabase
+        .from("ventas")
+        .select("*", { count: "exact" });
+      setVentasRealizadas(ventasCount || 0);
 
-  const fetchMostUsedFood = async () => {
-    const { data, error } = await supabase
-      .from("alimentaciones")
-      .select("alimento_id, cantidad, inventario (nombre)")
-      .order("alimento_id", { ascending: true });
+      const totalValor = ventasData?.reduce(
+        (acc, venta) => acc + (venta.valor || 0),
+        0
+      );
+      setTotalVentas(totalValor || 0);
 
-    if (error) {
-      console.error(error);
-      return;
-    }
+      const { count: muertos } = await supabase
+        .from("muertes")
+        .select("*", { count: "exact", head: true });
+      const { count: vendidos } = await supabase
+        .from("ventas")
+        .select("*", { count: "exact", head: true });
 
-    const summary: Record<string, { nombre: string; total: number }> = {};
-
-    (data as Alimentacion[]).forEach((item) => {
-      const id = item.alimento_id;
-      let nombre = "";
-      if (Array.isArray(item.inventario)) {
-        nombre = item.inventario[0]?.nombre ?? "";
-      } else if (item.inventario && typeof item.inventario === "object") {
-        nombre = item.inventario.nombre;
-      }
-      if (!summary[id]) {
-        summary[id] = { nombre, total: 0 };
-      }
-      summary[id].total += item.cantidad;
-    });
-
-    const mostUsed = Object.values(summary).sort((a, b) => b.total - a.total)[0];
-
-    if (mostUsed) {
-      setMostUsedFood(mostUsed.nombre);
-      setMostUsedFoodAmount(mostUsed.total);
+      setAnimalesVivos((total || 0) - (muertos || 0) - (vendidos || 0));
+    } catch (error) {
+      console.error("Error al obtener los datos:", error);
     }
   };
 
-  const fetchTodayFeedings = async () => {
-    const today = new Date().toISOString().split("T")[0];
-
-    const { data, error } = await supabase
-      .from("alimentaciones")
-      .select("*")
-      .eq("fecha", today);
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    setTodayFeedings(data.length);
-  };
+  const cards = [
+    {
+      title: "Total Animales",
+      value: totalAnimales,
+      icon: <Icon iconNode={cowHead} className="w-6 h-6 text-gray-700" />,
+      color: "text-gray-800",
+    },
+    {
+      title: "Animales Vivos",
+      value: animalesVivos,
+      icon: <HeartPulse className="w-6 h-6 text-green-600" />,
+      color: "text-green-600",
+    },
+    {
+      title: "Nacimientos (Mes)",
+      value: nacimientosMes,
+      icon: <Baby className="w-6 h-6 text-blue-600" />,
+      color: "text-blue-600",
+    },
+    {
+      title: "Muertes (Mes)",
+      value: muertesMes,
+      icon: <Skull className="w-6 h-6 text-red-600" />,
+      color: "text-red-600",
+    },
+    {
+      title: "Ventas Realizadas",
+      value: ventasRealizadas,
+      icon: <ShoppingCart className="w-6 h-6 text-gray-700" />,
+      color: "text-gray-700",
+    },
+    {
+      title: "Valor Total Ventas",
+      value: `$${totalVentas.toLocaleString("es-CO")}`,
+      icon: <DollarSign className="w-6 h-6 text-amber-600" />,
+      color: "text-amber-600",
+    },
+  ];
 
   return (
-    <div className="space-y-6 w-full max-w-7xl min-h-full mx-auto">
-      {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Total Inventario</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold">{totalWeight} Kg</div>
-            <div className="text-muted-foreground">Cantidad total disponible</div>
-          </CardContent>
-        </Card>
+    <div className="bg-white mx-auto p-4 md:p-8 w-full min-h-screen">
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Productos con Bajo Stock</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold">{lowStock.length}</div>
-            <div className="text-muted-foreground">Productos necesitan reposición</div>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Alimento Más Consumido</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-green-600 font-bold">{mostUsedFood}</div>
-            <div className="text-muted-foreground">{mostUsedFoodAmount} Kg consumidos</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Alimentaciones de Hoy</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold">{todayFeedings}</div>
-            <div className="text-muted-foreground">Sesiones registradas</div>
-          </CardContent>
-        </Card>
+      <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {cards.map((card, index) => (
+          <Card
+            key={index}
+            className="flex flex-col justify-between shadow-sm hover:shadow-md border h-[130px] transition"
+          >
+            <CardHeader className="flex flex-row justify-between items-center pb-0">
+              <CardTitle className="font-medium text-gray-500 text-sm text-center leading-tight">
+                {card.title}
+              </CardTitle>
+              {card.icon}
+            </CardHeader>
+            <CardContent className="flex justify-start items-end pb-4">
+              <div className={`text-3xl font-bold ${card.color}`}>
+                {card.value}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Tabla */}
-      <div className="bg-white rounded-lg p-4 shadow-md overflow-y-auto max-h-[450px]">
-        <div className="sticky top-[-20px] bg-white z-10">
-          <h2 className="text-xl font-bold mb-2">Inventario en tiempo real</h2>
-          <p className="text-muted-foreground ">Cantidad actual en almacenamiento</p>
-        </div>
 
-        <table className="w-full text-left border-collapse">
-          <thead className="sticky bg-gray-200  z-10 top-[40px]">
-            <tr className="border-b">
-              <th className="py-2">Nombre</th>
-              <th className="py-2">Tamaño de pellet (mm)</th>
-              <th className="py-2">Cantidad (Kg)</th>
-              <th className="py-2">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {inventory.map((item, index) => (
-              <tr key={index} className="border-b">
-                <td className="py-2">{item.nombre}</td>
-                <td>{item.tamaño}</td>
-                <td className="font-bold">{item.cantidad}</td>
-                <td>
-                  {item.cantidad < 40 ? (
-                    <Badge variant="destructive">Bajo Stock</Badge>
-                  ) : (
-                    <Badge variant="default">Disponible</Badge>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }

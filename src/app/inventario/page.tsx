@@ -20,11 +20,11 @@ import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-// ✅ CAMBIO 1: id como string (UUID)
+// Definición de la interfaz para los items del inventario
+// id: string porque viene como UUID desde Supabase
 interface InventarioItem {
   id: string;
   nombre: string;
-
   cantidad: number;
   marca: string;
   vencimiento: string;
@@ -32,24 +32,35 @@ interface InventarioItem {
 }
 
 export default function InventoryPage() {
+  // Estado que guarda la lista de productos del inventario
   const [inventory, setInventory] = useState<InventarioItem[]>([]);
+
+  // Estado para controlar la apertura del modal "Agregar producto"
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Estado para controlar la apertura del modal "Reabastecer producto"
   const [isRestockDialogOpen, setIsRestockDialogOpen] = useState(false);
+
+  // Estado que guarda el ID del producto seleccionado al reabastecer
   const [selectedProductId, setSelectedProductId] = useState<string>("");
+
+  // Estado para guardar la cantidad que se va a reabastecer
   const [restockAmount, setRestockAmount] = useState<string>("");
 
+  // Estado del formulario de agregar producto
   const [formData, setFormData] = useState({
     nombre: "",
-
     cantidad: "",
     marca: "",
     vencimiento: "",
     lote: "",
   });
 
+  // Estado de búsqueda y ordenamiento
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("desc");
 
+  // Función para traer todos los productos desde la tabla "inventario" en Supabase
   const fetchInventory = async () => {
     const { data, error } = await supabase.from("inventario").select("*");
     if (error) {
@@ -60,21 +71,24 @@ export default function InventoryPage() {
     }
   };
 
+  // Llamar a fetchInventory apenas se carga el componente
   useEffect(() => {
     fetchInventory();
   }, []);
 
+  // Función para agregar un producto nuevo al inventario
   const handleAddItem = async () => {
+    // Validación: nombre y cantidad son obligatorios
     if (!formData.nombre || !formData.cantidad) {
       toast.error("Por favor, complete todos los campos obligatorios.");
       return;
     }
 
+    // Insertar el nuevo producto en la tabla
     const { error } = await supabase.from("inventario").insert([
       {
         nombre: formData.nombre,
-
-        cantidad: parseFloat(formData.cantidad),
+        cantidad: parseFloat(formData.cantidad), // Se guarda como número
         marca: formData.marca,
         vencimiento: formData.vencimiento,
         lote: formData.lote,
@@ -86,42 +100,41 @@ export default function InventoryPage() {
       toast.error("Error al agregar producto.");
     } else {
       toast.success("Producto agregado exitosamente.");
+      // Reiniciar formulario
       setFormData({
         nombre: "",
-
         cantidad: "",
         marca: "",
         vencimiento: "",
         lote: "",
       });
       setIsDialogOpen(false);
-      fetchInventory();
+      fetchInventory(); // Actualizar lista
     }
   };
 
+  // Función para reabastecer un producto existente
   const handleRestock = async () => {
-    console.log("🔁 Reabastecimiento iniciado");
-    console.log("👉 selectedProductId:", selectedProductId);
-    console.log("👉 restockAmount:", restockAmount);
-
     const restockKg = parseFloat(restockAmount);
 
+    // Validaciones: debe existir producto y cantidad mayor a 0
     if (!selectedProductId || isNaN(restockKg) || restockKg <= 0) {
       toast.error("Seleccione un producto y escriba una cantidad válida mayor a 0.");
       return;
     }
 
-    // ✅ CAMBIO 2: comparar UUID como string
+    // Buscar el producto dentro del inventario
     const product = inventory.find((item) => item.id === selectedProductId);
 
     if (!product) {
-      console.log("⛔ Producto no encontrado. IDs disponibles:", inventory.map(i => i.id));
       toast.error("Producto no encontrado.");
       return;
     }
 
+    // Sumar la nueva cantidad
     const nuevaCantidad = product.cantidad + restockKg;
 
+    // Actualizar cantidad en la base de datos
     const { error } = await supabase
       .from("inventario")
       .update({ cantidad: nuevaCantidad })
@@ -135,10 +148,11 @@ export default function InventoryPage() {
       setIsRestockDialogOpen(false);
       setSelectedProductId("");
       setRestockAmount("");
-      fetchInventory();
+      fetchInventory(); // Refrescar lista
     }
   };
 
+  // Manejar cambios en inputs del formulario de agregar producto
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -146,6 +160,7 @@ export default function InventoryPage() {
     });
   };
 
+  // Filtrar y ordenar productos antes de mostrarlos
   const filteredInventory = inventory
     .filter((item) =>
       item.nombre.toLowerCase().includes(searchQuery.toLowerCase())
@@ -156,14 +171,16 @@ export default function InventoryPage() {
 
   return (
     <div className="space-y-6 mx-auto w-full max-w-7xl min-h-full">
+      {/* Encabezado con título y botones principales */}
       <div className="flex justify-between items-center">
         <h1 className="font-bold text-2xl">Gestión de Inventario</h1>
         <div className="flex gap-2">
           <Button onClick={() => setIsDialogOpen(true)}>+ Agregar Producto</Button>
-          <Button variant="outline" onClick={() => setIsRestockDialogOpen(true)}>🔄 Reabastecer</Button>
+          <Button variant="outline" onClick={() => setIsRestockDialogOpen(true)}>Reabastecer</Button>
         </div>
       </div>
 
+      {/* Barra de búsqueda y ordenamiento */}
       <div className="flex gap-4 mb-4">
         <Input
           placeholder="Buscar por nombre"
@@ -183,12 +200,12 @@ export default function InventoryPage() {
         </Select>
       </div>
 
+      {/* Tabla de inventario */}
       <div className="bg-white shadow-md p-4 rounded-lg max-h-[500px] overflow-x-auto overflow-y-auto">
         <table className="w-full text-left border-collapse">
-          <thead className="top-[-20px] z-10 sticky bg-gray-100">
+          <thead className="sticky top-[-20px] bg-gray-100">
             <tr className="border-b">
               <th className="px-4 py-2">Tipo de Alimento</th>
-
               <th className="px-4 py-2">Cantidad (kg)</th>
               <th className="px-4 py-2">Marca</th>
               <th className="px-4 py-2">Fecha de Vencimiento</th>
@@ -209,7 +226,7 @@ export default function InventoryPage() {
         </table>
       </div>
 
-      {/* Modal Agregar */}
+      {/* Modal para agregar producto */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -218,6 +235,7 @@ export default function InventoryPage() {
           </DialogHeader>
 
           <div className="space-y-4">
+            {/* Select con los tipos de alimentos predefinidos */}
             <Select value={formData.nombre} onValueChange={(value) => setFormData({ ...formData, nombre: value })}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecciona tipo de alimento" />
@@ -240,16 +258,18 @@ export default function InventoryPage() {
               </SelectContent>
             </Select>
 
+            {/* Inputs del formulario */}
             <Input placeholder="Cantidad (kg)" name="cantidad" value={formData.cantidad} onChange={handleInputChange} />
             <Input placeholder="Marca" name="marca" value={formData.marca} onChange={handleInputChange} />
             <Input placeholder="Fecha de Vencimiento" name="vencimiento" value={formData.vencimiento} onChange={handleInputChange} />
             <Input placeholder="Lote" name="lote" value={formData.lote} onChange={handleInputChange} />
+
             <Button className="w-full" onClick={handleAddItem}>Agregar</Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Modal Reabastecer */}
+      {/* Modal para reabastecer producto */}
       <Dialog open={isRestockDialogOpen} onOpenChange={setIsRestockDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -258,6 +278,7 @@ export default function InventoryPage() {
           </DialogHeader>
 
           <div className="space-y-4">
+            {/* Select con los productos actuales */}
             <Select value={selectedProductId} onValueChange={setSelectedProductId}>
               <SelectTrigger>
                 <SelectValue placeholder="Seleccionar producto" />
@@ -271,6 +292,7 @@ export default function InventoryPage() {
               </SelectContent>
             </Select>
 
+            {/* Input de la cantidad a añadir */}
             <Input
               type="number"
               placeholder="Cantidad a añadir (Kg)"

@@ -19,14 +19,17 @@ import * as React from "react"
 import toast, { Toaster } from "react-hot-toast"
 
 export default function Ganado() {
+  // Estados para manejar fechas seleccionadas
   const [fechaNacimiento, setFechaNacimiento] = React.useState<Date | undefined>()
   const [fechaUltimoChequeo, setFechaUltimoChequeo] = React.useState<Date | undefined>()
 
+  // Manejo del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const form = e.target as HTMLFormElement
     const formData = new FormData(form)
 
+    // Datos a guardar en la tabla "animales"
     const data = {
       codigo_identificacion: formData.get("codigoIdentificacion"),
       raza: formData.get("raza"),
@@ -39,12 +42,13 @@ export default function Ganado() {
       observacion: formData.get("observacion"),
     }
 
+    // Insertar en Supabase
     const { error } = await supabase.from("animales").insert([data])
     if (error) {
-      console.error("❌ Error al registrar:", error.message)
+      console.error("Error al registrar:", error.message)
       toast.error("Hubo un error al guardar el animal")
     } else {
-      toast.success(" Animal registrado con éxito")
+      toast.success("Animal registrado con éxito")
       form.reset()
       setFechaNacimiento(undefined)
       setFechaUltimoChequeo(undefined)
@@ -53,17 +57,20 @@ export default function Ganado() {
 
   return (
     <>
+      {/* Toaster para mostrar notificaciones */}
       <Toaster position="top-right" />
+
       <Card className="mx-auto mt-5 w-full">
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-5 w-full">
             <h2 className="mb-4 pb-2 border-b font-semibold text-gray-800 text-xl">Información Animal</h2>
 
+            {/* Grid con inputs principales */}
             <div className="gap-4 grid md:grid-cols-2 w-full">
-              {/* ID del Animal */}
+              {/* Código de identificación */}
               <div>
-                <Label className="block mb-1 font-medium text-gray-700 text-sm">Codigo Identificación</Label>
-                <Input type="number" name="codigoIdentificacion" placeholder="Codigo" required />
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">Código Identificación</Label>
+                <Input type="number" name="codigoIdentificacion" placeholder="Código" required />
               </div>
 
               {/* Raza */}
@@ -103,15 +110,14 @@ export default function Ganado() {
                 </Select>
               </div>
 
-              {/* Fecha de Nacimiento */}
+              {/* Fecha de nacimiento */}
               <div className="flex flex-col gap-2">
-                <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Nacimiento <span className="text-gray-400 text-sm">(Opcional)</span> </Label>
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">
+                  Fecha de Nacimiento <span className="text-gray-400 text-sm">(Opcional)</span>
+                </Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="justify-start w-full font-normal text-left"
-                    >
+                    <Button variant="outline" className="justify-start w-full font-normal text-left">
                       <CalendarIcon className="mr-2 w-4 h-4" />
                       {fechaNacimiento ? format(fechaNacimiento, "yyyy-MM-dd") : "Selecciona fecha"}
                     </Button>
@@ -130,15 +136,14 @@ export default function Ganado() {
                 </Popover>
               </div>
 
-              {/* Fecha de Último Chequeo */}
+              {/* Fecha de último chequeo */}
               <div className="flex flex-col gap-2">
-                <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Último Chequeo <span className="text-gray-400 text-sm">(Opcional)</span></Label>
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">
+                  Fecha de Último Chequeo <span className="text-gray-400 text-sm">(Opcional)</span>
+                </Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="justify-start w-full font-normal text-left"
-                    >
+                    <Button variant="outline" className="justify-start w-full font-normal text-left">
                       <CalendarIcon className="mr-2 w-4 h-4" />
                       {fechaUltimoChequeo ? format(fechaUltimoChequeo, "yyyy-MM-dd") : "Selecciona fecha"}
                     </Button>
@@ -157,7 +162,7 @@ export default function Ganado() {
                 </Popover>
               </div>
 
-              {/* Estado de Salud */}
+              {/* Estado de salud */}
               <div>
                 <Label className="block mb-1 font-medium text-gray-700 text-sm">Estado de Salud</Label>
                 <Select name="estadoSalud" required>
@@ -190,7 +195,7 @@ export default function Ganado() {
               </div>
             </div>
 
-            {/* Observación */}
+            {/* Observaciones */}
             <div className="col-span-2">
               <Label className="block mb-1 font-medium text-gray-700 text-sm">
                 Observación <span className="text-gray-400 text-sm">(Opcional)</span>
@@ -203,8 +208,7 @@ export default function Ganado() {
               />
             </div>
 
-
-            {/* Botón */}
+            {/* Botón de enviar */}
             <div className="text-center">
               <Button type="submit" className="bg-green-600 hover:bg-green-700 w-full md:w-auto">
                 + Registrar Animal

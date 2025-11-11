@@ -14,6 +14,7 @@ function getSectionTitle(pathname: string) {
     "/reporte_consumo": "Reporte de Consumo de Alimento",
     "/registro_ganado": "Registro de Ganado",
     "/ganado": "Ganado Registrado",
+    "/registro_nacimiento_mortalidad": "Registro de Nacimiento y Mortalidad de animales ",
   };
   return sectionTitles[pathname] || "Panel de Control";
 }

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   Sidebar,
   SidebarContent,
@@ -8,31 +8,39 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { ChartColumn, NotebookPen, Package } from "lucide-react";
+import { cowHead } from "@lucide/lab";
+import {
+  ClipboardList,
+  Gauge,
+  Icon,
+  NotebookPen,
+  Package,
+  Skull,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FaClipboardList } from "react-icons/fa";
-import { MdSpaceDashboard } from "react-icons/md";
-import { PiCowFill } from "react-icons/pi";
+
+// Componente personalizado para el ícono de vaca
+const CowIcon = (props: any) => <Icon iconNode={cowHead} {...props} />;
 
 // Menu items.
 const items = [
   {
     title: "Panel de Control",
     url: "/panel_control",
-    icon: MdSpaceDashboard,
+    icon: Gauge, // Dashboard icon
   },
   {
     title: "Registro Ganado",
     url: "/registro_ganado",
-    icon: PiCowFill,
+    icon: CowIcon, // Usamos el componente CowIcon
   },
   {
     title: "Ganado Registrado",
     url: "/ganado",
-    icon: FaClipboardList,
+    icon: ClipboardList, // List of animals
   },
   {
     title: "Inventario",
@@ -40,52 +48,52 @@ const items = [
     icon: Package,
   },
   {
-    title: "Registro de alimentacion",
+    title: "Registro de Alimentación",
     url: "/registro_alimentacion",
     icon: NotebookPen,
   },
   {
-    title: "Reporte de consumo",
-    url: "/reporte_consumo",
-    icon: ChartColumn,
+    title: "Registro de Nacimientos y Mortalidad",
+    url: "/registro_nacimientos_mortalidad",
+    icon: Skull,
   },
-
-]
+];
 
 export function AppSidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
   return (
     <Sidebar>
       <SidebarHeader>
-
         <SidebarGroup>
           <SidebarGroupLabel>
             <div className="flex items-center gap-3 mt-2">
               <div className="bg-blue-100 p-2 rounded-full text-blue-600">
-                <PiCowFill className="size-6" />
+                <CowIcon className="size-6" />
               </div>
-              <span className="font-bold text-gray-700 text-xl tracking-wide">Fondo Ganadero </span>
+              <span className="font-bold text-gray-700 text-xl tracking-wide">
+                Fondo Ganadero
+              </span>
             </div>
-
           </SidebarGroupLabel>
-
-          <SidebarGroupContent>
-
-          </SidebarGroupContent>
+          <SidebarGroupContent></SidebarGroupContent>
         </SidebarGroup>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Navegacion</SidebarGroupLabel>
+            <SidebarGroupLabel>Navegación</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {items.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <Link href={item.url}
-                        className={`flex items-center gap-2 px-2 py-1 rounded ${pathname.startsWith(item.url) ? 'bg-gray-200 font-semibold' : ''
-                          }`}>
-                        <item.icon />
-                        <span className="active:font-medium">{item.title}</span>
+                      <Link
+                        href={item.url}
+                        className={`flex items-center gap-2 px-2 py-1 rounded transition-colors ${pathname.startsWith(item.url)
+                          ? "bg-gray-200 font-semibold text-blue-700"
+                          : "hover:bg-gray-100"
+                          }`}
+                      >
+                        <item.icon className="w-5 h-5" />
+                        <span>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -96,5 +104,5 @@ export function AppSidebar() {
         </SidebarContent>
       </SidebarHeader>
     </Sidebar>
-  )
+  );
 }

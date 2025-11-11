@@ -38,7 +38,7 @@ const items = [
     icon: CowIcon, // Usamos el componente CowIcon
   },
   {
-    title: "Ganado Registrado",
+    title: "Ganado",
     url: "/ganado",
     icon: ClipboardList, // List of animals
   },
@@ -48,12 +48,12 @@ const items = [
     icon: Package,
   },
   {
-    title: "Registro de Alimentación",
+    title: "Alimentación",
     url: "/registro_alimentacion",
     icon: NotebookPen,
   },
   {
-    title: "Registro de Nacimientos y Mortalidad",
+    title: "Nacimientos y Mortalidad",
     url: "/registro_nacimientos_mortalidad",
     icon: Skull,
   },

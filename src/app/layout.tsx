@@ -20,7 +20,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <html lang="es">
-      <body className="flex min-h-screen overflow-hidden">
+      <body className="flex min-h-screen">
         <SidebarProvider>
           <AppSidebar />
           <main className="flex-1 p-6">

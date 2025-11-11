@@ -18,6 +18,7 @@ import {
   NotebookPen,
   Package,
   Skull,
+  DollarSign,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -32,15 +33,16 @@ const items = [
     url: "/panel_control",
     icon: Gauge, // Dashboard icon
   },
+  
   {
-    title: "Registro Ganado",
-    url: "/registro_ganado",
-    icon: CowIcon, // Usamos el componente CowIcon
-  },
-  {
-    title: "Ganado Registrado",
+    title: "Ganado",
     url: "/ganado",
     icon: ClipboardList, // List of animals
+  },
+  {
+    title: "Ventas",
+    url: "/ventas",
+    icon: DollarSign, // List of animals
   },
   {
     title: "Inventario",
@@ -48,12 +50,12 @@ const items = [
     icon: Package,
   },
   {
-    title: "Registro de Alimentación",
+    title: "Alimentación",
     url: "/registro_alimentacion",
     icon: NotebookPen,
   },
   {
-    title: "Registro de Nacimientos y Mortalidad",
+    title: "Nacimientos y Mortalidad",
     url: "/registro_nacimientos_mortalidad",
     icon: Skull,
   },

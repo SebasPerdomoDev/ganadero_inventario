@@ -25,8 +25,8 @@ export default function Header() {
 
   return (
     <header className="flex justify-start items-center mb-4">
-      <SidebarTrigger className="hover:bg-gray-100 p-2 border rounded-lg w-12 h-12" />
-      <SeparatorVerticalIcon className="mx-4 h-8" />
+      <SidebarTrigger className="hover:bg-gray-100 p-2 border rounded-lg w-12 h-12 mr-4" />
+      
       <h1 className="font-bold text-3xl">{activeSection}</h1>
     </header>
   );

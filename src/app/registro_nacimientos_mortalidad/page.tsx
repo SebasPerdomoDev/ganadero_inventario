@@ -233,7 +233,28 @@ export default function RegistroAnimalesTabs() {
                                             required
                                         />
                                     </div>
+                                    {/* Padre */}
+                                    <ComboboxAnimal
+                                        label="Padre"
+                                        placeholder="Selecciona el padre"
+                                        animales={animalesVivos}
+                                        sexoFiltro="macho"
+                                        valorSeleccionado={padreSeleccionado}
+                                        onSeleccionar={setPadreSeleccionado}
+                                    />
+                                    
+                                    {/* Madre */}
+                                    <ComboboxAnimal
+                                        label="Madre"
+                                        placeholder="Selecciona la madre"
+                                        animales={animalesVivos}
+                                        sexoFiltro="hembra"
+                                        valorSeleccionado={madreSeleccionada}
+                                        onSeleccionar={setMadreSeleccionada}
+                                    />
 
+                                    
+                                    
                                     <div className="flex flex-col gap-2">
                                         <Label>Fecha de Nacimiento</Label>
                                         <Popover>
@@ -262,26 +283,6 @@ export default function RegistroAnimalesTabs() {
                                         </Popover>
                                     </div>
 
-
-                                    {/* Madre */}
-                                    <ComboboxAnimal
-                                        label="Madre"
-                                        placeholder="Selecciona la madre"
-                                        animales={animalesVivos}
-                                        sexoFiltro="hembra"
-                                        valorSeleccionado={madreSeleccionada}
-                                        onSeleccionar={setMadreSeleccionada}
-                                    />
-
-                                    {/* Padre */}
-                                    <ComboboxAnimal
-                                        label="Padre"
-                                        placeholder="Selecciona el padre"
-                                        animales={animalesVivos}
-                                        sexoFiltro="macho"
-                                        valorSeleccionado={padreSeleccionado}
-                                        onSeleccionar={setPadreSeleccionado}
-                                    />
 
                                     <div>
                                         <Label>Observación</Label>

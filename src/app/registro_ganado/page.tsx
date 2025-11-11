@@ -14,11 +14,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { supabase } from "@/lib/supabase"
 import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, ArrowLeft } from "lucide-react"
 import * as React from "react"
 import toast, { Toaster } from "react-hot-toast"
+import { useRouter } from "next/navigation"
 
 export default function Ganado() {
+  const router = useRouter()
+
   const [fechaNacimiento, setFechaNacimiento] = React.useState<Date | undefined>()
   const [fechaUltimoChequeo, setFechaUltimoChequeo] = React.useState<Date | undefined>()
   const [fechaMuerte, setFechaMuerte] = React.useState<Date | undefined>()
@@ -28,44 +31,13 @@ export default function Ganado() {
   const [openChequeo, setOpenChequeo] = React.useState(false)
   const [openMuerte, setOpenMuerte] = React.useState(false)
 
-  // Código incremental
-  const [nuevoCodigo, setNuevoCodigo] = React.useState<number | null>(null)
-
-  // Al cargar, calcular el nuevo código
-  React.useEffect(() => {
-    const obtenerSiguienteCodigo = async () => {
-      const { data, error } = await supabase
-        .from("animales")
-        .select("codigo_identificacion")
-        .order("codigo_identificacion", { ascending: false })
-        .limit(1)
-
-      if (error) {
-        console.error("❌ Error al obtener código:", error.message)
-        toast.error("No se pudo obtener el código automático")
-      } else {
-        const ultimoCodigo = data?.[0]?.codigo_identificacion
-          ? Number(data[0].codigo_identificacion)
-          : 0
-        setNuevoCodigo(ultimoCodigo + 1)
-      }
-    }
-
-    obtenerSiguienteCodigo()
-  }, [])
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const form = e.target as HTMLFormElement
     const formData = new FormData(form)
     const hoy = new Date()
 
-    if (!nuevoCodigo) {
-      toast.error("No se pudo generar el código automáticamente")
-      return
-    }
-
-    // 🧩 Validaciones lógicas
+    //  Validaciones lógicas
     if (fechaNacimiento && fechaUltimoChequeo && fechaUltimoChequeo < fechaNacimiento) {
       toast.error("❌ La fecha de último chequeo no puede ser menor a la de nacimiento.")
       return
@@ -75,7 +47,7 @@ export default function Ganado() {
       return
     }
 
-    // 🚫 Validaciones de fechas futuras
+    //  Validaciones de fechas futuras
     if (fechaNacimiento && fechaNacimiento > hoy) {
       toast.error("❌ La fecha de nacimiento no puede ser posterior a hoy.")
       return
@@ -104,33 +76,44 @@ export default function Ganado() {
 
     const { error } = await supabase.from("animales").insert([data])
     if (error) {
-      console.error("❌ Error al registrar:", error.message)
+      console.error(" Error al registrar:", error.message)
       toast.error("Hubo un error al guardar el animal")
     } else {
-      toast.success(`✅ Animal #${nuevoCodigo} registrado con éxito`)
+      toast.success(" Animal registrado con éxito")
       form.reset()
       setFechaNacimiento(undefined)
       setFechaUltimoChequeo(undefined)
       setFechaMuerte(undefined)
-      setNuevoCodigo(nuevoCodigo + 1) // preparar el siguiente
     }
   }
+
 
   return (
     <>
       <Toaster position="top-right" />
       <Card className="mx-auto mt-5 w-full">
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-5 w-full">
-            <h2 className="mb-4 pb-2 border-b font-semibold text-gray-800 text-xl">
+          {/*  Encabezado con botón "Volver" */}
+          <div className="flex items-center justify-between mb-4 pb-2 border-b">
+            <h2 className="font-semibold text-gray-800 text-xl">
               Información Animal
             </h2>
+            <Button
+              onClick={() => router.push("/ganado")}
+              className="bg-gray-200 hover:bg-gray-300 text-gray-800 flex items-center gap-2 cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Volver
+            </Button>
+          </div>
 
+          {/* 🔹 Formulario principal */}
+          <form onSubmit={handleSubmit} className="space-y-5 w-full">
             <div className="gap-4 grid md:grid-cols-2 w-full">
-              {/* Código de identificación automático */}
+              {/* Código de identificación manual */}
               <div>
-                <Label className="block mb-1 font-medium text-gray-700 text-sm">Codigo Identificación</Label>
-                <Input type="number" name="codigoIdentificacion" placeholder="Codigo" required />
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">Código Identificación</Label>
+                <Input type="number" name="codigoIdentificacion" placeholder="Código" required />
               </div>
 
               {/* Raza */}
@@ -172,9 +155,7 @@ export default function Ganado() {
 
               {/* Fecha de Nacimiento */}
               <div className="flex flex-col gap-2">
-                <Label className="block mb-1 font-medium text-gray-700 text-sm">
-                  Fecha de Nacimiento
-                </Label>
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Nacimiento</Label>
                 <Popover open={openNacimiento} onOpenChange={setOpenNacimiento}>
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="justify-start w-full font-normal text-left">
@@ -202,9 +183,7 @@ export default function Ganado() {
 
               {/* Fecha de Último Chequeo */}
               <div className="flex flex-col gap-2">
-                <Label className="block mb-1 font-medium text-gray-700 text-sm">
-                  Fecha de Último Chequeo
-                </Label>
+                <Label className="block mb-1 font-medium text-gray-700 text-sm">Fecha de Último Chequeo</Label>
                 <Popover open={openChequeo} onOpenChange={setOpenChequeo}>
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="justify-start w-full font-normal text-left">
@@ -317,8 +296,7 @@ export default function Ganado() {
               />
             </div>
 
-
-            {/* Botón */}
+            {/* Botón Registrar */}
             <div className="text-center">
               <Button type="submit" className="bg-green-600 hover:bg-green-700 w-full md:w-auto">
                 + Registrar Animal

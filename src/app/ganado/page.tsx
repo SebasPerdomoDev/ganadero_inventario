@@ -3,6 +3,7 @@
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -31,7 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Eye, Trash2 } from "lucide-react";
+import { Edit, Eye, Trash2, Plus } from "lucide-react";
 
 // ====== Tipado ======
 type Animal = {
@@ -49,6 +50,8 @@ type Animal = {
 };
 
 export default function AnimalesTable() {
+  const router = useRouter();
+
   // ===== Estados principales =====
   const [animales, setAnimales] = useState<Animal[]>([]);
   const [animalesFiltrados, setAnimalesFiltrados] = useState<Animal[]>([]);
@@ -148,34 +151,6 @@ export default function AnimalesTable() {
     setOpenEdit(true);
   };
 
-  const handleSave = async () => {
-    if (!animalSeleccionado) return;
-    const { error } = await supabase
-      .from("animales")
-      .update({
-        raza: form.raza,
-        peso: form.peso,
-        estado_salud: form.estado_salud,
-        ubicacion: form.ubicacion,
-        sexo: form.sexo,
-        observacion: form.observacion,
-      })
-      .eq("id", animalSeleccionado.id);
-
-    if (error) toast.error("❌ No se pudo actualizar el animal");
-    else {
-      const updated = { ...animalSeleccionado, ...form } as Animal;
-      setAnimales((prev) =>
-        prev.map((a) => (a.id === animalSeleccionado.id ? updated : a))
-      );
-      setAnimalesFiltrados((prev) =>
-        prev.map((a) => (a.id === animalSeleccionado.id ? updated : a))
-      );
-      setOpenEdit(false);
-      toast.success("✅ Animal actualizado correctamente");
-    }
-  };
-
   // ===== Eliminar animal =====
   const handleDelete = async () => {
     if (!animalSeleccionado) return;
@@ -204,6 +179,8 @@ export default function AnimalesTable() {
 
   return (
     <div className="mt-5">
+      
+
       {/* ================= FILTROS ================= */}
       <div className="flex flex-col md:flex-row items-center gap-4 mb-5">
         <Input
@@ -299,6 +276,16 @@ export default function AnimalesTable() {
             </SelectContent>
           </Select>
         </div>
+        {/* ================= ENCABEZADO + BOTÓN NUEVO ================= */}
+        <div className="flex ml-36 items-center ">
+          <Button
+            onClick={() => router.push("/registro_ganado")}
+            className="bg-green-600 hover:bg-green-700 flex cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            Nuevo
+          </Button>
+        </div>
       </div>
 
       {/* ================= TABLA ================= */}
@@ -370,6 +357,8 @@ export default function AnimalesTable() {
         </div>
       )}
 
+      {/* ... tus modales se mantienen igual */}
+ 
      
       {/* ================= MODAL observacion ================= */}
 
